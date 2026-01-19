@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "everything-search": {
+      "command": "everything-search-mcp",
+      "args": []
+    }
+  }
+}

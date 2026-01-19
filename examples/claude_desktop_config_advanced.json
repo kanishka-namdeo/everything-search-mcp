@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "everything-search": {
+      "command": "node",
+      "args": [
+        "/path/to/everything-search-mcp/dist/index.js"
+      ],
+      "env": {
+        "EVERYTHING_PATH": "C:\\Program Files\\Everything",
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
