@@ -1,13 +1,28 @@
 {
   "name": "everything-search-mcp",
   "version": "1.0.0",
-  "description": "MCP server for fast file search using Everything (Windows) with cross-platform fallbacks",
+  "description": "MCP server for fast file search using Everything (Windows) with cross-platform fallbacks for macOS (Spotlight) and Linux (ripgrep/locate)",
   "main": "dist/index.js",
   "type": "module",
+  "bin": {
+    "everything-search-mcp": "dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
+    "prepublishOnly": "npm run build && npm test",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage"
@@ -17,11 +32,26 @@
     "model-context-protocol",
     "everything",
     "file-search",
+    "search",
     "windows",
-    "search"
+    "macos",
+    "linux",
+    "spotlight",
+    "ripgrep",
+    "cross-platform",
+    "cli",
+    "anthropic"
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/everything-search-mcp.git"
+  },
+  "bugs": {
+    "url": "https://www.npmjs.com/package/everything-search-mcp"
+  },
+  "homepage": "https://www.npmjs.com/package/everything-search-mcp",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.22.4"

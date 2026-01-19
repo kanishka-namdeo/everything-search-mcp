@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-01-20
+## [1.0.0] - 2026-01-20
 
 ### Added
 
@@ -118,18 +118,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No measurable performance impact from security measures
 - All tests complete in ~650ms
 
-## [1.0.0] - Initial Release
+### Fixed
 
-### Added
-
-- Everything Search SDK integration for Windows
-- Spotlight (mdfind) integration for macOS
-- ripgrep and locate support for Linux
-- MCP server implementation
-- File search with wildcards and operators
-- File metadata retrieval
-- Platform detection and status checking
-- Basic error handling
+- Command injection vulnerabilities on all platforms (Windows, macOS, Linux)
+- Path traversal vulnerabilities in file operations
+- Missing input validation for all parameters
+- Unbounded resource consumption
+- Type safety issues with `any` types
+- Information disclosure in error messages
 
 ---
 
