@@ -2,19 +2,32 @@
 
 ## Installation
 
-1. **Install the MCP server:**
+1. **Install MCP server:**
    ```bash
    npm install -g everything-search-mcp
    ```
 
-2. **Windows users only:**
-   - Install Everything from https://www.voidtools.com/
-   - Start Everything (ensure it's running before using the MCP server)
+2. **Windows users:**
+   - es.exe CLI tool is **automatically downloaded** during npm install
+   - No manual installation required
+   - For additional features, optionally install Everything from https://www.voidtools.com/
 
 3. **Linux users (optional but recommended):**
    ```bash
    sudo apt install ripgrep
    ```
+
+## How Automatic es.exe Download Works
+
+When you run `npm install -g everything-search-mcp` on Windows:
+
+1. The postinstall script automatically runs
+2. Your system architecture is detected (x64, x86, or ARM64)
+3. The latest ES release is downloaded from GitHub
+4. es.exe is extracted to the package's bin directory
+5. The package is ready to use immediately
+
+**No manual steps required!**
 
 ## Configuration
 
@@ -22,7 +35,7 @@ Add to Claude Desktop config:
 
 **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 
-**Windows:** `%APPDATA%\Claude/claude_desktop_config.json`
+**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
@@ -89,7 +102,7 @@ Show details for a specific file
 
 ### Check Status
 ```
-Verify Everything is running
+Verify Everything is available
 ```
 
 **MCP Tool Call:**
@@ -105,7 +118,7 @@ Verify Everything is running
 ### Windows (Everything)
 - `*.pdf` - All PDF files
 - `document AND (pdf OR docx)` - Documents with PDF or DOCX extension
-- `report NOT draft` - Reports without "draft" in the name
+- `report NOT draft` - Reports without "draft" in name
 - `"my file".txt` - Exact phrase match
 - `size:>1mb` - Files larger than 1MB
 
@@ -122,20 +135,51 @@ Verify Everything is running
 
 ## Troubleshooting
 
-### Everything not running (Windows)
-1. Install Everything from voidtools.com
-2. Start Everything and wait for indexing
-3. Restart Claude Desktop
+### Windows
 
-### Search returns no results
-1. Check search engine is available using `check_status`
-2. Ensure files are indexed
-3. Try a broader search query
+**es.exe not found during installation**
 
-### Errors with specific paths
-1. Use full paths
-2. Escape special characters on Windows: `\\` instead of `\`
-3. Check file permissions
+If the automatic download fails:
+1. Check your internet connection
+2. Ensure GitHub is accessible from your network
+3. Try reinstalling the package:
+   ```bash
+   npm uninstall everything-search-mcp
+   npm install -g everything-search-mcp
+   ```
+
+**Search returns no results**
+1. Use `check_status` tool to verify Everything is available
+2. For best results, install full Everything application and run it
+3. Ensure files are indexed
+4. Try a broader search query
+
+**Manual es.exe download (fallback)**
+
+If automatic download fails completely:
+1. Visit https://github.com/voidtools/ES/releases
+2. Download the appropriate zip file for your architecture (x64, x86, or ARM64)
+3. Extract es.exe from the zip
+4. Place es.exe in the package's bin directory
+
+### macOS
+
+**mdfind command not found**
+- This should not happen as mdfind is built into macOS
+- Check that Spotlight is enabled in System Settings
+
+### Linux
+
+**Neither ripgrep nor locate found**
+- Install ripgrep for best performance:
+  ```bash
+  sudo apt install ripgrep
+  ```
+- Or install locate as a fallback:
+  ```bash
+  sudo apt install mlocate
+  sudo updatedb
+  ```
 
 ## Tips
 
@@ -144,3 +188,4 @@ Verify Everything is running
 - Use `maxResults` to limit results for large searches
 - Combine `sortBy` and `sortOrder` for organized results
 - On Windows, Everything's query syntax is most powerful
+- es.exe CLI tool is sufficient for most use cases; installing full Everything application is optional

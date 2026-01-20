@@ -12,6 +12,7 @@ A Model Context Protocol (MCP) server for fast file search using Everything (Win
   - Regex support
   - Sorting by name, size, date, etc.
   - File metadata retrieval
+  - Automatic es.exe download during npm install
 
 - **macOS**: Spotlight integration via mdfind
   - Native macOS search
@@ -34,13 +35,47 @@ A Model Context Protocol (MCP) server for fast file search using Everything (Win
 
 ## Installation
 
-### Prerequisites
+### Install MCP Server
+
+```bash
+npm install -g everything-search-mcp
+```
+
+Or for local development:
+
+```bash
+npm install
+npm run build
+npm link
+```
+
+### Platform-Specific Setup
 
 #### Windows Users
 
+**Automatic Setup (Recommended)**
+
+The es.exe CLI tool is automatically downloaded during npm install:
+
+- Supports x64, x86, and ARM64 architectures
+- Downloads latest stable release from GitHub
+- No manual installation required
+- es.exe is stored locally in the package directory
+
+The automatic download:
+1. Detects your system architecture (x64/x86/ARM64)
+2. Downloads the appropriate ES zip file from voidtools/ES releases
+3. Extracts es.exe to the local bin directory
+4. Cleans up the zip file
+
+**Manual Setup (Optional)**
+
+If you want the full Everything application for additional features:
 1. Install Everything from [voidtools.com](https://www.voidtools.com/)
 2. Ensure Everything is running
 3. Enable "Run as administrator" for best results
+
+**Note**: The MCP server works with just es.exe CLI tool. Installing the full Everything application is optional.
 
 #### macOS Users
 
@@ -62,20 +97,6 @@ Or use locate (slower):
 sudo apt install mlocate  # Ubuntu/Debian
 sudo dnf install mlocate  # Fedora
 sudo pacman -S mlocate    # Arch Linux
-```
-
-### Install the MCP Server
-
-```bash
-npm install -g everything-search-mcp
-```
-
-Or for local development:
-
-```bash
-npm install
-npm run build
-npm link
 ```
 
 ## Configuration
@@ -101,7 +122,7 @@ Add to your Claude Desktop configuration file:
 
 ### Advanced Configuration
 
-The MCP server uses standard configuration and doesn't require additional environment variables. Simply ensure Everything (Windows) or ripgrep/locate (Linux) are installed and accessible in your system PATH.
+The MCP server uses standard configuration and doesn't require additional environment variables. On Windows, es.exe is automatically downloaded during npm install. On Linux, ensure ripgrep/locate are installed and accessible in your system PATH.
 
 ## Usage
 
@@ -158,7 +179,7 @@ Advanced search with sorting and options:
 
 ### search_files
 
-Search for files and folders using the platform's search engine.
+Search for files and folders using platform's search engine.
 
 **Parameters:**
 
@@ -240,7 +261,7 @@ Get detailed metadata for a specific file or folder.
 
 ### check_status
 
-Check the status of the search engine and platform.
+Check status of search engine and platform.
 
 **Parameters:** None
 
@@ -251,10 +272,10 @@ Check the status of the search engine and platform.
   "success": true,
   "status": {
     "platform": "windows",
-    "searchEngine": "Everything",
+    "searchEngine": "Everything (es.exe CLI)",
     "available": true,
-    "version": "1.4.1.1019",
-    "message": "Everything search available"
+    "version": "1.1.0.36",
+    "message": "Everything command-line interface available"
   }
 }
 ```
@@ -262,6 +283,16 @@ Check the status of the search engine and platform.
 ## Platform-Specific Features
 
 ### Windows (Everything)
+
+**Automatic es.exe Download:**
+
+During `npm install`, the package automatically:
+1. Detects system architecture (x64, x86, or ARM64)
+2. Downloads the latest ES release from GitHub
+3. Extracts es.exe to the local bin directory
+4. Stores es.exe alongside the package
+
+This eliminates the need to manually install Everything or configure es.exe.
 
 **Query Operators:**
 - `AND` - Both terms must match
@@ -307,7 +338,6 @@ Check the status of the search engine and platform.
 ### Overview
 
 This MCP server implements comprehensive security measures to protect against common vulnerabilities:
-
 - **Command Injection Protection**: All user inputs are sanitized to remove shell metacharacters (`;`, `&`, `|`, `$`, `(`, `)`, `` ` ``, `~`)
 - **Path Traversal Protection**: Detects and blocks `..` sequences and home directory access (`~`)
 - **Input Validation**: Strict validation of query length (max 1000 chars), path length (max 4096 chars), and parameter bounds
@@ -318,7 +348,6 @@ This MCP server implements comprehensive security measures to protect against co
 ### Security Testing
 
 All security measures are validated by 44 automated tests:
-
 - **22 Security Tests**: Input validation, sanitization, and protection mechanisms
 - **22 Integration Tests**: Real-world attack scenarios and edge cases
 
@@ -338,9 +367,35 @@ When using this MCP server:
 ### Windows
 
 **Error: "es.exe not found"**
-- Install Everything from https://www.voidtools.com/
-- Ensure es.exe is in your system PATH
-- Restart Claude Desktop after installation
+
+The es.exe CLI tool should be automatically downloaded during npm install. If you see this error:
+
+1. Run the download script manually:
+   ```bash
+   node node_modules/everything-search-mcp/scripts/download-es.js
+   ```
+2. Check that you have internet connectivity to download from GitHub
+3. Verify npm install completed successfully
+4. Try reinstalling the package:
+   ```bash
+   npm uninstall everything-search-mcp
+   npm install -g everything-search-mcp
+   ```
+
+**Download Fails During npm install**
+
+If the automatic download fails:
+1. Check your internet connection
+2. Ensure GitHub is accessible from your network
+3. Manually download es.exe from https://github.com/voidtools/ES/releases
+4. Place es.exe in the package's `bin/` directory
+
+**Search Returns No Results**
+
+1. Ensure Everything (full application) is running and has indexed files
+2. Run Everything and let it complete indexing
+3. Check file paths are accessible
+4. Try a broader search query
 
 ### macOS
 

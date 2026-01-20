@@ -10,7 +10,8 @@ test-*.js
 
 # Development files
 examples/
-scripts/
+# scripts/ (but keep download-es.js)
+scripts/test.js
 *.config.js
 *.config.ts
 
@@ -62,3 +63,6 @@ yarn-error.log*
 .editorconfig
 .prettierrc
 .eslintrc*
+
+# Old SDK (not used anymore)
+dist/everything-sdk/**

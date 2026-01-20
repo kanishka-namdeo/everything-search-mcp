@@ -43,7 +43,6 @@ coverage/
 
 # Trae IDE specific
 .trae/
-.trae/
 
 # OS specific
 .DS_Store
@@ -178,12 +177,17 @@ Icon
 *.lib
 *.obj
 *.o
-*.exe
 *.dll
 *.so
 *.dylib
 *.a
 *.pyc
 *.pyo
+
+# Documentation files (internal)
 AGENTS.md
 IMPLEMENTATION_SUMMARY.md
+
+# But keep bin/es.exe for MCP server (es.exe CLI tool downloaded by postinstall script)
+!bin/
+!bin/es.exe

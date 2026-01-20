@@ -1,8 +1,14 @@
-import { spawn, exec } from 'child_process';
+import { exec } from 'child_process';
 import { promisify } from 'util';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { sanitizeShellArg, validateSearchQuery, validatePath, SecurityConfig } from '../utils/validation.js';
 import type { SearchOptions, FileInfo, PlatformStatus } from '../types/index.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const rootDir = join(__dirname, '..', '..');
+const esPath = join(rootDir, 'bin', 'es.exe');
 const execPromise = promisify(exec);
 
 interface ESOutput {
@@ -99,7 +105,7 @@ export async function searchFiles(options: SearchOptions): Promise<any[]> {
       }
     }
     
-    const { stdout, stderr } = await execPromise(`es ${args.join(' ')}`, {
+    const { stdout, stderr } = await execPromise(`"${esPath}" ${args.join(' ')}`, {
       maxBuffer: SecurityConfig.MAX_BUFFER_SIZE,
       windowsHide: true,
       timeout: SecurityConfig.COMMAND_TIMEOUT,
@@ -131,7 +137,7 @@ export async function searchFiles(options: SearchOptions): Promise<any[]> {
     return results;
   } catch (error: any) {
     if (error.code === 'ENOENT') {
-      throw new Error('es.exe not found. Please install Everything from https://www.voidtools.com/ and ensure es.exe is in your PATH.');
+      throw new Error('es.exe not found. Please run: npm run postinstall to download es.exe');
     }
     if (error.name === 'ETIMEDOUT') {
       throw new Error('Search operation timed out. Please try a narrower query.');
@@ -145,7 +151,7 @@ export async function getFileInfo(path: string): Promise<FileInfo> {
     validatePath(path);
     const sanitizedPath = sanitizeShellArg(path);
     
-    const { stdout, stderr } = await execPromise(`es -n 1 -info "${sanitizedPath}"`, {
+    const { stdout, stderr } = await execPromise(`"${esPath}" -n 1 -info "${sanitizedPath}"`, {
       maxBuffer: SecurityConfig.MAX_BUFFER_SIZE,
       windowsHide: true,
     });
@@ -180,7 +186,7 @@ export async function getFileInfo(path: string): Promise<FileInfo> {
       throw error;
     }
     if (error.code === 'ENOENT') {
-      throw new Error('es.exe not found. Please install Everything from https://www.voidtools.com/ and ensure es.exe is in your PATH.');
+      throw new Error('es.exe not found. Please run: npm run postinstall to download es.exe');
     }
     throw new Error(`Failed to get file info: ${error.message}`);
   }
@@ -188,7 +194,7 @@ export async function getFileInfo(path: string): Promise<FileInfo> {
 
 export async function getStatus(): Promise<any> {
   try {
-    const { stdout } = await execPromise('es -version', {
+    const { stdout } = await execPromise(`"${esPath}" -version`, {
       maxBuffer: 1024,
       windowsHide: true,
     });
@@ -208,7 +214,7 @@ export async function getStatus(): Promise<any> {
         platform: 'windows',
         searchEngine: 'Everything (es.exe CLI)',
         available: false,
-        message: 'es.exe not found. Please install Everything from https://www.voidtools.com/ and ensure es.exe is in your PATH or specify EVERYTHING_PATH environment variable.',
+        message: 'es.exe not found. Please run: npm run postinstall to download es.exe',
       };
     }
     return {
