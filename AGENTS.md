@@ -9,7 +9,7 @@ across any edit.
 - npm package `everything-search-mcp` (`package.json:3`, currently `1.2.0`): an MCP server exposing
   filesystem search over stdio, so an LLM can locate files by name across an entire drive.
 - Three tools only, defined in `src/index.ts:26-105`: `search_files`, `get_file_info`,
-  `check_status`. `README.md:93-187` is the tool reference of record.
+  `check_status`. `README.md:94-188` is the tool reference of record.
 - Search engine is chosen by OS at runtime (`src/search/unified.ts:13-52`): Windows shells out to
   the vendored `bin/es.exe` (voidtools Everything CLI), macOS uses `mdfind` (Spotlight), Linux uses
   `ripgrep` and falls back to `locate`. Nothing here talks to the Everything SDK. This engine serves

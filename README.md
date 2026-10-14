@@ -3,6 +3,7 @@
 <img src="https://raw.githubusercontent.com/kanishka-namdeo/everything-search-mcp/main/assets/social-preview.png" alt="everything-search-mcp — whole-drive file search for your AI agents" width="100%">
 
 [![npm version](https://img.shields.io/npm/v/everything-search-mcp?style=flat-square)](https://www.npmjs.com/package/everything-search-mcp)
+[![npm downloads](https://img.shields.io/npm/dm/everything-search-mcp?style=flat-square)](https://www.npmjs.com/package/everything-search-mcp)
 [![License: MIT](https://img.shields.io/npm/l/everything-search-mcp?style=flat-square)](https://github.com/kanishka-namdeo/everything-search-mcp/blob/main/LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen?style=flat-square)](https://nodejs.org/)
 ![Windows](https://img.shields.io/badge/platform-windows-blue?style=flat-square)
