@@ -18,7 +18,7 @@ DOX local contract for `src/search/`. Parent: [`AGENTS.md`](../AGENTS.md). Close
   - `getPlatformInfo(): {platform: string; searchEngine: string; isPrimary: boolean}` — `unified.ts:54`. Defect: exported but imported nowhere in `src/` or `tests/` (dead code).
 - Dispatch order is win32 → darwin → linux via `isWindows/isDarwin/isLinux` from `src/utils/platform.js` (`unified.ts:1`, `unified.ts:14-19`). Because `getPlatform()` defaults anything non-darwin/win32 to `'linux'` (`src/utils/platform.ts:3-8`), the `else` branches are reachable only in odd builds.
 - Asymmetric unsupported-platform behavior (binding, actual, not ideal): `searchFilesUnified` and `getFileInfoUnified` throw `Unsupported platform: ${process.platform}` (`unified.ts:21`, `unified.ts:33`), while `getStatusUnified` returns a graceful `{searchEngine: 'none', available: false}` status instead of throwing (`unified.ts:45-50`).
-- No validation or sanitization happens in this folder; the platform modules enforce `src/utils/validation.ts` themselves (`windows-cli.ts:64,151`, `darwin.ts:10,84`, `linux.ts:10,96`). Do not add sanitization here — keep it a thin pass-through.
+- No validation or sanitization happens in this folder; the platform modules enforce `src/utils/validation.ts` themselves — `searchFiles` in each adapter (`windows-cli.ts:65,66`, `darwin.ts:10,12`, `linux.ts:10,12`), and `getFileInfo` by delegating to the shared `src/platform/file-info.ts:10` (`validatePath` + Node `fs`). Do not add sanitization here — keep it a thin pass-through.
 - Only consumer: `src/index.ts:11` imports the three `*Unified` functions.
 
 ## Work Guidance
@@ -27,7 +27,7 @@ DOX local contract for `src/search/`. Parent: [`AGENTS.md`](../AGENTS.md). Close
 - Relative imports require the `.js` extension (ESM; `unified.ts:1-11`).
 
 ## Verification
-- `npm test` = `vitest run`; currently 81/81 across three files (`tests/security.test.ts` 22, `tests/integration.test.ts` 22, `tests/tool-args.test.ts` 37). No test imports `unified.ts` — the new gate test pulls in `src/tool-args.js`, not dispatch — so nothing here has automated coverage.
+- `npm test` = `vitest run`; currently 89/89 across four files (`tests/security.test.ts` 22, `tests/integration.test.ts` 22, `tests/tool-args.test.ts` 37, `tests/file-info.test.ts` 8 — which imports `src/platform/file-info.js`, not this folder). No test imports `unified.ts` — dispatch itself has no automated coverage.
 - `npm run build` = `tsc` (`strict: true`, `tsconfig.json:8`) is the existing check that the triad signatures stay aligned.
 - On this Windows machine only the `isWindows()` branch can be exercised at runtime; the darwin/linux branches are unverified.
 

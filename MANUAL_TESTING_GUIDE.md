@@ -581,6 +581,6 @@ After completing manual tests, fill out this report:
 
 For reference, automated test results are in [TEST_RESULTS.md](file:///d:/test_mcp/everything-search-mcp/TEST_RESULTS.md).
 
-**Automated Test Status**: ✅ ALL TESTS PASSED (81/81, vitest 5.0.4)
+**Automated Test Status**: ✅ ALL TESTS PASSED (89/89, vitest 5.0.4)
 
 *Last Updated: 2026-01-20*

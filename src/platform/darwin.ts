@@ -1,7 +1,8 @@
 import { spawn, exec } from 'child_process';
 import { promisify } from 'util';
 import type { SearchResult, SearchOptions, FileInfo, PlatformStatus } from '../types/index.js';
-import { sanitizeShellArg, validateSearchQuery, validatePath, SecurityConfig } from '../utils/validation.js';
+import { sanitizeShellArg, validateSearchQuery, SecurityConfig } from '../utils/validation.js';
+import { getFileInfoFs } from './file-info.js';
 
 const execPromise = promisify(exec);
 
@@ -80,42 +81,7 @@ export async function searchFiles(options: SearchOptions): Promise<SearchResult[
 }
 
 export async function getFileInfo(path: string): Promise<FileInfo> {
-  try {
-    validatePath(path);
-    const sanitizedPath = sanitizeShellArg(path);
-    
-    const { stdout } = await execPromise(`stat -f "%N %z %SB %Sm %Sc" "${sanitizedPath}"`, {
-      maxBuffer: SecurityConfig.MAX_BUFFER_SIZE,
-      timeout: SecurityConfig.COMMAND_TIMEOUT,
-    });
-    
-    const parts = (typeof stdout === 'string' ? stdout : '').trim().split('\n');
-    
-    if (parts.length < 2) {
-      throw new Error(`File not found or inaccessible: ${path}`);
-    }
-    
-    const name = parts[0];
-    const isDirectory = parts[1] === '1';
-    const size = parseInt(parts[2], 10);
-    const modified = parseInt(parts[3], 10);
-    
-    const info: FileInfo = {
-      path,
-      name,
-      size,
-      modified: new Date(modified * 1000),
-      isFile: !isDirectory,
-      isFolder: isDirectory,
-    };
-    
-    return info;
-  } catch (error: any) {
-    if (error.name === 'ValidationError') {
-      throw error;
-    }
-    throw new Error(`Failed to get file info: ${error.message}`);
-  }
+  return getFileInfoFs(path);
 }
 
 export async function getStatus(): Promise<PlatformStatus> {

@@ -12,7 +12,9 @@ across any edit.
   `check_status`. `README.md:178-282` is the tool reference of record.
 - Search engine is chosen by OS at runtime (`src/search/unified.ts:13-52`): Windows shells out to
   the vendored `bin/es.exe` (voidtools Everything CLI), macOS uses `mdfind` (Spotlight), Linux uses
-  `ripgrep` and falls back to `locate`. Nothing here talks to the Everything SDK.
+  `ripgrep` and falls back to `locate`. Nothing here talks to the Everything SDK. This engine serves
+  `search_files` and `check_status` only; `get_file_info` does NOT use it — it reads live metadata via
+  the shared, shell-free `src/platform/file-info.ts` Node `fs` helper on every platform.
 - ESM-only (`package.json:6`), Node `>=20.0.0` (`package.json:69-71`, `"node": ">=20.0.0"` at `:70`),
   TypeScript `strict` with `src/` → `dist/` (`tsconfig.json:2-15`). The compiler is TypeScript 7 —
   the native Go port, so `tsc` CLI usage is unchanged and platform binaries arrive as
@@ -88,8 +90,9 @@ notes rather than explaining history. Trim obvious statements and dead warnings.
   unknown-key stripping only; length, range and content limits stay in `src/utils/validation.ts`, so
   security codes keep firing from the same places.
 - `npm test` is `vitest run` (vitest 5.0.4). With no `vitest.config.*`, only `tests/*.test.ts`
-  execute: `tests/security.test.ts`, `tests/integration.test.ts` and `tests/tool-args.test.ts`,
-  81 tests total. `tests/real-world-test.js`, `test-simulation.js` and `scripts/test.js` are manual
+  execute: `tests/security.test.ts`, `tests/integration.test.ts`, `tests/tool-args.test.ts` and
+  `tests/file-info.test.ts`, 89 tests total. `tests/real-world-test.js`, `test-simulation.js` and
+  `scripts/test.js` are manual
   harnesses outside the suite.
 
 ## User Preferences
@@ -105,7 +108,8 @@ notes rather than explaining history. Trim obvious statements and dead warnings.
 - [`src/AGENTS.md`](src/AGENTS.md) — server entry, MCP tool surface and request dispatch; parent of
   the four source folders below.
 - [`src/platform/AGENTS.md`](src/platform/AGENTS.md) — per-OS search adapters (`windows-cli.ts`,
-  `darwin.ts`, `linux.ts`) and the external CLIs each one shells out to.
+  `darwin.ts`, `linux.ts`) and the external CLIs each one shells out to, plus the shared shell-free
+  `file-info.ts` Node `fs` helper that all three delegate `get_file_info` to.
 - [`src/search/AGENTS.md`](src/search/AGENTS.md) — the platform-agnostic dispatch layer that routes
   a call to exactly one adapter.
 - [`src/types/AGENTS.md`](src/types/AGENTS.md) — shared `SearchResult`/`SearchOptions`/`FileInfo`/

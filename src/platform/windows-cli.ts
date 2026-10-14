@@ -2,8 +2,9 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { sanitizeShellArg, validateSearchQuery, validatePath, SecurityConfig } from '../utils/validation.js';
+import { sanitizeShellArg, validateSearchQuery, SecurityConfig } from '../utils/validation.js';
 import type { SearchOptions, FileInfo, PlatformStatus } from '../types/index.js';
+import { getFileInfoFs } from './file-info.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -146,49 +147,7 @@ export async function searchFiles(options: SearchOptions): Promise<any[]> {
 }
 
 export async function getFileInfo(path: string): Promise<FileInfo> {
-  try {
-    validatePath(path);
-    const sanitizedPath = sanitizeShellArg(path);
-    
-    const { stdout, stderr } = await execPromise(`"${esPath}" -n 1 -info "${sanitizedPath}"`, {
-      maxBuffer: SecurityConfig.MAX_BUFFER_SIZE,
-      windowsHide: true,
-    });
-    
-    const stderrStr = typeof stderr === 'string' ? stderr : '';
-    if (stderrStr.length > 0) {
-      throw new Error(`es.exe error: ${stderr}`);
-    }
-    
-    const stdoutStr = typeof stdout === 'string' ? stdout : '';
-    const esResults = parseESOutput(stdoutStr);
-    
-    if (esResults.length === 0) {
-      throw new Error(`File not found: ${path}`);
-    }
-    
-    const r = esResults[0];
-    
-    return {
-      name: r.fileName,
-      path: r.path || '',
-      size: r.size,
-      created: r.dateCreated ? new Date(r.dateCreated) : undefined,
-      modified: r.dateModified ? new Date(r.dateModified) : undefined,
-      attributes: r.attributes ? parseInt(r.attributes, 10) : undefined,
-      extension: r.fileName.includes('.') ? r.fileName.split('.').pop() : undefined,
-      isFolder: r.isFolder ?? (r.attributes?.includes('D') ?? false),
-      isFile: r.isFile ?? !(r.attributes?.includes('D') ?? true),
-    };
-  } catch (error: any) {
-    if (error.name === 'ValidationError') {
-      throw error;
-    }
-    if (error.code === 'ENOENT') {
-      throw new Error('es.exe not found. Please run: npm run postinstall to download es.exe');
-    }
-    throw new Error(`Failed to get file info: ${error.message}`);
-  }
+  return getFileInfoFs(path);
 }
 
 export async function getStatus(): Promise<any> {

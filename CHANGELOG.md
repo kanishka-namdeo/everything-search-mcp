@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Tool argument validation with zod 4 (`src/tool-args.ts`): a missing or non-string `query` for `search_files`, a missing or non-string `path` for `get_file_info`, or `maxResults`/`offset` sent as non-numeric strings are rejected with `errorCode: "INVALID_ARGUMENTS"` inside the existing failure envelope; no schema or envelope shape changed
 - `tests/tool-args.test.ts` (37 tests) covering the gate's accept/reject matrix
+- `src/platform/file-info.ts`: a shared, shell-free Node `fs` helper (`getFileInfoFs`) that all three platform adapters delegate `get_file_info` to
+- `tests/file-info.test.ts` (8 tests) covering the shared helper (real file/dir metadata, `ENOENT`, and the `validatePath` rejection codes)
 
 ### Changed
 
@@ -28,7 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `engines.node` raised to `>=20.0.0` (`package.json:70`, previously `>=18.0.0`)
 - CI moved to Node 24 with `actions/checkout@v7`, `actions/setup-node@v7` and `cache: npm`; vitest 5.0.4 engines are `^22.12.0 || ^24.0.0 || >=26.0.0`, so the previous Node 20 pin could not run `npm test`
-- Automated suite is now 3 files / 81 tests, passing
+- Automated suite is now 4 files / 89 tests, passing
+
+#### Behavior changed
+
+- `get_file_info` now reports **live filesystem** metadata (Node `fs.stat`) instead of the search-engine index, and no longer shells out on any platform. Consequences: it no longer needs `es.exe`/`stat` to be present; `name`/`path` are derived from the caller's path (`basename`/`dirname`); the optional `attributes` field is now always `undefined` (Node `fs` cannot produce the Windows DIR bitmask); a path missing from disk now returns "File not found" rather than stale index data. `search_files` and `check_status` are unchanged.
 
 #### Behavior preserved
 
@@ -37,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Windows `search_files` sorting: `sortOrder: "descending"` emitted a standalone `-descending` switch that the vendored ES 1.1.0.36 rejects (`Error 6: Unknown switch.`), so any descending sort failed. The direction is now encoded in the `-sort` value (e.g. `size-descending`) in `src/platform/windows-cli.ts`
+- `get_file_info` was broken on every platform: Windows called `es.exe -n 1 -info` (a switch the vendored ES 1.1.0.36 does not have, so it always returned `UNKNOWN_ERROR`), and the macOS/Linux `stat` parsers mis-mapped their own output. All three adapters now delegate to the shared `src/platform/file-info.ts` `fs` helper, which succeeds and returns real metadata
 
 ### Security
 

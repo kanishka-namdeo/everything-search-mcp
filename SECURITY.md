@@ -187,7 +187,7 @@ Logs do not contain sensitive information.
 - Path traversal detection
 - Error handling
 
-**Results**: ✅ All 81 tests pass (22 security + 22 integration + 37 tool-argument)
+**Results**: ✅ All 89 tests pass (22 security + 22 integration + 37 tool-argument + 8 file-info)
 
 ### Integration Tests
 
@@ -284,7 +284,7 @@ The server follows security best practices from:
 - Command injection protection
 - Path traversal detection
 - Resource limits
-- Security test suite (81 tests)
+- Security test suite (89 tests)
 - Security documentation
 
 ### Future Enhancements

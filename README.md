@@ -251,7 +251,6 @@ Get detailed metadata for a specific file or folder.
     "created": "2024-01-15T08:00:00.000Z",
     "modified": "2024-01-20T10:30:00.000Z",
     "accessed": "2024-01-20T10:30:00.000Z",
-    "attributes": 32,
     "extension": "txt",
     "isFolder": false,
     "isFile": true

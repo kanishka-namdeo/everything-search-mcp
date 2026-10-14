@@ -23,7 +23,7 @@ DOX local contract for `.github/`. Parent: [`AGENTS.md`](../AGENTS.md). Closer d
 
 ## Verification
 - Nothing validates this folder locally: the workflow only executes on a published release, and neither `actionlint` nor GitHub's `act` is configured or installed here.
-- The closest local equivalents of what CI does are `npm ci` followed by `npm test` (`package.json:28`) and `npm pack --dry-run` for the published file list. Measured locally under vitest `^5.0.4`: `npm test` runs 3 files / 81 tests, all passing across 20 consecutive runs, and `npm pack --dry-run` lists 42 files.
+- The closest local equivalents of what CI does are `npm ci` followed by `npm test` (`package.json:28`) and `npm pack --dry-run` for the published file list. Measured locally under vitest `^5.0.4`: `npm test` runs 4 files / 89 tests, all passing across 20 consecutive runs, and `npm pack --dry-run` lists 46 files.
 - A real end-to-end verification of this file requires cutting a prerelease, which is a release action and needs explicit user approval.
 
 ## Child DOX Index
