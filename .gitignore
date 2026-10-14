@@ -185,7 +185,6 @@ Icon
 *.pyo
 
 # Documentation files (internal)
-AGENTS.md
 IMPLEMENTATION_SUMMARY.md
 
 # But keep bin/es.exe for MCP server (es.exe CLI tool downloaded by postinstall script)
