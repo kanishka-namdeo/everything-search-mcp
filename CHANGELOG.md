@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-14
+
 ### Added
 
 - Tool argument validation with zod 4 (`src/tool-args.ts`): a missing or non-string `query` for `search_files`, a missing or non-string `path` for `get_file_info`, or `maxResults`/`offset` sent as non-numeric strings are rejected with `errorCode: "INVALID_ARGUMENTS"` inside the existing failure envelope; no schema or envelope shape changed
