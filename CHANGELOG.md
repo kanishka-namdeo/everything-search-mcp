@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Tool argument validation with zod 4 (`src/tool-args.ts`): a missing or non-string `query` for `search_files`, a missing or non-string `path` for `get_file_info`, or `maxResults`/`offset` sent as non-numeric strings are rejected with `errorCode: "INVALID_ARGUMENTS"` inside the existing failure envelope; no schema or envelope shape changed
+- `tests/tool-args.test.ts` (37 tests) covering the gate's accept/reject matrix
+
+### Changed
+
+#### Dependencies
+
+- `@modelcontextprotocol/sdk` to `^1.32.1`
+- `zod` to `^4.6.7`
+- `adm-zip` to `^0.6.1` (`package.json:60`) — `extractEntryTo` gained two extra optional trailing parameters, so all `scripts/download-es.js` call sites are unchanged
+- `@types/node` to `^26.6.5`
+- `tsx` to `^4.23.15`
+- `typescript` to `^7.0.2` (the native Go compiler); `npm run build` is still `tsc`
+- `vitest` to `^5.0.4`
+
+#### Build and CI
+
+- `engines.node` raised to `>=20.0.0` (`package.json:70`, previously `>=18.0.0`)
+- CI moved to Node 24 with `actions/checkout@v7`, `actions/setup-node@v7` and `cache: npm`; vitest 5.0.4 engines are `^22.12.0 || ^24.0.0 || >=26.0.0`, so the previous Node 20 pin could not run `npm test`
+- Automated suite is now 3 files / 81 tests, passing
+
+#### Behavior preserved
+
+- Inputs that are loose but valid are still accepted by design: numeric strings such as `"50"` are coerced, out-of-range numbers like `0` or `5000` are still clamped by the platform adapters, `null` still falls back to the documented defaults (100 results, offset 0), unrecognized extra keys are ignored, and out-of-enum `sortBy`/`sortOrder` still fall back the way the adapters already did
+
+### Fixed
+
+- Windows `search_files` sorting: `sortOrder: "descending"` emitted a standalone `-descending` switch that the vendored ES 1.1.0.36 rejects (`Error 6: Unknown switch.`), so any descending sort failed. The direction is now encoded in the `-sort` value (e.g. `size-descending`) in `src/platform/windows-cli.ts`
+
+### Security
+
+- `npm audit` now reports 0 vulnerabilities, down from 20 (3 critical, 5 high); the critical finding was a tinypool prototype-pollution RCE pulled in by vitest 2
+
 ## [1.0.0] - 2026-01-20
 
 ### Added

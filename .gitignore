@@ -186,6 +186,7 @@ Icon
 
 # Documentation files (internal)
 IMPLEMENTATION_SUMMARY.md
+useless.md
 
 # But keep bin/es.exe for MCP server (es.exe CLI tool downloaded by postinstall script)
 !bin/

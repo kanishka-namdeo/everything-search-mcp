@@ -141,6 +141,8 @@ return {
 };
 ```
 
+**Note**: the snippet above is illustrative, not literal code. The server never emits `VALIDATION_ERROR`. The real catch block in [src/index.ts](src/index.ts) sets `errorCode` from the thrown error's `code`, so the only values that reach a client are `ValidationError.code` from [src/utils/validation.ts](src/utils/validation.ts) (`QUERY_TOO_LONG`, `PATH_TRAVERSAL`, `HOME_PATH_NOT_ALLOWED`, `INVALID_CHARACTERS`, `PATH_TOO_LONG`), `INVALID_ARGUMENTS` from the zod 4 tool-argument gate in [src/tool-args.ts](src/tool-args.ts), or `UNKNOWN_ERROR` when the error carries no code. The envelope shape (`success`, `error`, `errorCode`, `tool`, `isError`) is exactly as shown.
+
 **Protected Information**:
 - File system paths
 - System configuration
@@ -185,7 +187,7 @@ Logs do not contain sensitive information.
 - Path traversal detection
 - Error handling
 
-**Results**: ✅ All 44 tests pass (22 security + 22 integration)
+**Results**: ✅ All 81 tests pass (22 security + 22 integration + 37 tool-argument)
 
 ### Integration Tests
 
@@ -267,6 +269,9 @@ The server follows security best practices from:
 2. **No Authorization**: All accessible files can be queried
 3. **No Encryption**: Communication security depends on MCP client
 4. **No Audit Logging**: Security events logged but not audited
+5. **Argument gate is presence/type only**: the zod 4 gate in [src/tool-args.ts](src/tool-args.ts) rejects a missing or non-string `query`/`path` and non-numeric strings for `maxResults`/`offset` with `INVALID_ARGUMENTS`; length, range and character limits are still enforced downstream by `src/utils/validation.ts` and the platform adapters, which keep clamping out-of-range numbers.
+6. **Windows `get_file_info` always fails**: `src/platform/windows-cli.ts:154` runs `es.exe -n 1 -info <path>`, but the vendored ES `1.1.0.36` binary has no `-info` switch (a direct run returns `Error 6: Unknown switch.`), so the tool answers `{success: false, errorCode: "UNKNOWN_ERROR"}` for every path. Pre-existing defect, proven by a runtime stdio probe of `node dist/index.js`; unrelated to the dependency upgrade and not mitigated.
+7. **On Windows a >1000-character query reports `UNKNOWN_ERROR`, not `QUERY_TOO_LONG`**: the catch at `src/platform/windows-cli.ts:138-146` re-wraps every error and drops `error.code`, while the message text still reads "Query exceeds maximum length of 1000 characters". `getFileInfo` rethrows `ValidationError` correctly at `:185-187`. Pre-existing defect, not mitigated.
 
 **Recommendation**: Use within trusted environments and follow MCP security guidelines.
 
@@ -279,7 +284,7 @@ The server follows security best practices from:
 - Command injection protection
 - Path traversal detection
 - Resource limits
-- Security test suite (44 tests)
+- Security test suite (81 tests)
 - Security documentation
 
 ### Future Enhancements

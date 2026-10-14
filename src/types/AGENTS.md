@@ -8,7 +8,7 @@ DOX local contract for `src/types/`. Parent: [`AGENTS.md`](../AGENTS.md). Closer
 
 ## Ownership
 - This subtree owns the shape of `SearchResult`, `SearchOptions`, `FileInfo`, `PlatformStatus` as consumed by `index.ts`, `search/unified.ts`, `platform/*`, and `utils/validation.ts` callers.
-- Not owned here: runtime validation of those shapes (`src/utils/validation.ts`), how fields get populated (`src/platform/*.ts` parsing), tool-level JSON response key selection (`src/index.ts:152-162`, `:184-195`).
+- Not owned here: runtime validation of those shapes (`src/utils/validation.ts`), how fields get populated (`src/platform/*.ts` parsing), tool-level JSON response key selection (`src/index.ts:153-163`, `:185-196`).
 
 ## Local Contracts
 - Active types and their importers (binding):
@@ -16,7 +16,7 @@ DOX local contract for `src/types/`. Parent: [`AGENTS.md`](../AGENTS.md). Closer
   - `SearchOptions` — `types/index.ts:15-26`; imported by `unified.ts:11` and all three `src/platform/*.ts`.
   - `FileInfo` — `types/index.ts:28-39`; `PlatformStatus` — `types/index.ts:41-47`; both used across `index.ts:12`, `unified.ts:11`, `windows-cli.ts:6`, `darwin.ts:3`, `linux.ts:3`.
 - Optionality is a real cross-platform invariant: `size`, `modified`, `created`, `extension`, `attributes`, `accessed`, `runCount` are optional because `mdfind`/`locate` results carry only `name/path/fullPath/isFile/isFolder` (`src/platform/darwin.ts:53-59`, `src/platform/linux.ts:65-71`); only `es.exe` output fills the rest (`src/platform/windows-cli.ts:124-135`). Do not make these required.
-- The `sortBy` string union is duplicated verbatim in `SearchOptions` (`types/index.ts:19`) and the handler cast (`src/index.ts:122`), and both mirror the tool schema enum (`src/index.ts:50`). Changing one requires changing all three.
+- The `sortBy` string union is duplicated in four places: `SearchOptions` (`types/index.ts:19`), the tool schema enum (`src/index.ts:50`), the handler cast (`src/index.ts:123`), and the list restated inside the discriminating check at `tests/tool-args.test.ts:186`. Changing one requires changing all four. The zod gate deliberately does not enum-narrow it (`sortBy: z.unknown().optional()`, `src/tool-args.ts:10`), so `src/index.ts:123` is the only thing typing it for the adapter.
 - `requestFlags?: number` (`types/index.ts:25`) is declared but read nowhere in `src/` or `tests/` — a leftover field.
 - Dead legacy block: `SortType` (`types/index.ts:49-75`), `RequestFlag`/`RequestFlags` (`:77-96`), `SortTypes` (`:98-125`), `EverythingErrorCodes` (`:127-138`) are verified imported by nothing in `src/` or `tests/`; they are leftovers from the abandoned Everything-SDK approach (`.gitignore:15` "not used - es.exe CLI is used instead"). Defect: shipped dead exports. Do not build new code on them.
 - `PlatformStatus.version` and `.message` are optional and populated only by platform `getStatus()` implementations (e.g. `windows-cli.ts:204-209`, `unified.ts:45-50`).
@@ -27,8 +27,8 @@ DOX local contract for `src/types/`. Parent: [`AGENTS.md`](../AGENTS.md). Closer
 - No formatter exists; match the existing single-interface-per-block style.
 
 ## Verification
-- The existing check is `npm run build` = `tsc` with `strict: true` and `declaration: true` (`tsconfig.json:8,13`); because every importer uses `import type`, `tsc` is the only enforcement of these contracts.
-- `npm test` (vitest, 44/44: `security.test.ts` 22 + `integration.test.ts` 22) imports only `src/utils/validation.js` — nothing in `src/types/` has or needs runtime test coverage, and no test asserts these shapes today.
+- The existing check is `npm run build` = `tsc` with `strict: true` and `declaration: true` (`tsconfig.json:8,12`); because every importer uses `import type`, `tsc` is the only enforcement of these contracts.
+- `npm test` (vitest 5.0.4, 81/81 across three files) imports `src/utils/validation.js` and, since `tool-args.test.ts`, `src/tool-args.js` — nothing in `src/types/` has or needs runtime test coverage, and no test asserts these shapes today.
 
 ## Child DOX Index
 (none)

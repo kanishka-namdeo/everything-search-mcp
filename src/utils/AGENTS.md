@@ -11,7 +11,7 @@ DOX local contract for `src/utils`. Parent: [`AGENTS.md`](../../AGENTS.md). Clos
 
 Owns: `src/utils/validation.ts` (contracts below) and `src/utils/platform.ts`.
 
-Stays owned elsewhere (`src/AGENTS.md` / sibling subtrees): how and where the validators are called (`src/platform/*.ts` entry points, `src/search/`), the tool-facing option schema (`src/search/`, `src/index.ts`), and the shared type shapes (`src/types/index.ts`). This folder does not decide adapter CLI behavior.
+Stays owned elsewhere (`src/AGENTS.md` / sibling subtrees): how and where the validators are called (`src/platform/*.ts` entry points, `src/search/`), the tool-facing option schema (`src/search/`, `src/index.ts`), the zod argument gate `src/tool-args.ts` — a `src/`-root module that imports `ValidationError` from `validation.ts:1-10` but is not part of this folder — and the shared type shapes (`src/types/index.ts`). This folder does not decide adapter CLI behavior.
 
 ## Local Contracts
 
@@ -22,6 +22,7 @@ Stays owned elsewhere (`src/AGENTS.md` / sibling subtrees): how and where the va
 ### ValidationError (`validation.ts:1-10`)
 
 - `Error` subclass with `name = 'ValidationError'`, a public `code: string` (machine-readable, e.g. `'QUERY_TOO_LONG'`), and a public `statusCode: number` defaulting to `400` (`:5`). Callers rethrow on `error.name === 'ValidationError'` (`darwin.ts:72-74`, `linux.ts:84-86`, `windows-cli.ts:185-187`).
+- `INVALID_ARGUMENTS` is the only code this class carries that is NOT defined here: `src/tool-args.ts:40` constructs `ValidationError` with it when the zod gate rejects. It is a gate code — not a `SecurityConfig`/`validation.ts` code — so do not add validators or length/range rules for it in this folder.
 
 ### Validators
 
@@ -46,6 +47,8 @@ Stays owned elsewhere (`src/AGENTS.md` / sibling subtrees): how and where the va
 
 - `tests/security.test.ts` covers `src/utils/validation.ts` thoroughly — 22 tests across `sanitizeShellArg` / `validateSearchQuery` / `validatePath` / `validateSearchOptions`, passing via `npm test` (= `vitest run`, `package.json:28`).
 - `tests/integration.test.ts` (22 tests, passing) also imports only this folder: its suites cover attack scenarios, valid-input acceptance, sanitization quality, error-code shape, and per-call cost of the validators. Neither file exercises `src/index.ts` or the tool schema.
+- `tests/tool-args.test.ts` (37 tests, passing) imports `ValidationError` from here (`:8`) only, to assert `code`/`statusCode` on gate rejections; its subject is `src/tool-args.ts`, whose length/range/content rules it deliberately leaves to `validation.ts`.
+- `validation.ts` was NOT modified by the dependency upgrade — the gate delegates to it, so `QUERY_TOO_LONG`, `PATH_TRAVERSAL`, `HOME_PATH_NOT_ALLOWED`, `INVALID_CHARACTERS` and `PATH_TOO_LONG` still fire from these validators.
 - `src/utils/platform.ts` has no dedicated automated tests; behavior is exercised only indirectly.
 
 ## Child DOX Index

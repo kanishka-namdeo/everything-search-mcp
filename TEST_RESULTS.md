@@ -2,9 +2,9 @@
 
 ## Executive Summary
 
-**Test Status**: ✅ ALL TESTS PASSED (44/44)
+**Test Status**: ✅ ALL TESTS PASSED (81/81)
 
-The Everything Search MCP server has been thoroughly tested with a comprehensive test suite covering security vulnerabilities, edge cases, validation, and performance characteristics. All 44 tests pass successfully.
+The Everything Search MCP server has been thoroughly tested with a comprehensive test suite covering security vulnerabilities, edge cases, validation, tool-argument gating, and performance characteristics. All 81 tests pass successfully.
 
 ## Test Coverage
 
@@ -22,6 +22,11 @@ The Everything Search MCP server has been thoroughly tested with a comprehensive
    - Sanitization quality
    - Error handling quality
    - Performance characteristics
+
+3. **[tests/tool-args.test.ts](file:///d:/test_mcp/everything-search-mcp/tests/tool-args.test.ts)** - 37 tests
+   - Tool-argument gate accept/reject matrix (`src/tool-args.ts`)
+   - Coercion, `null`, out-of-range and unknown-key behavior preserved as before the gate
+   - Discrimination checks proving the gate's permissiveness is deliberate
 
 ## Test Results
 

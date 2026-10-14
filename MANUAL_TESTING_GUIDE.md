@@ -7,7 +7,7 @@ This guide provides step-by-step instructions for manually testing the Everythin
 ## Prerequisites
 
 1. **Everything Search (Windows)**: Install from https://www.voidtools.com/
-2. **Node.js 18+**: Required for running the server
+2. **Node.js 20+**: Required for running the server
 3. **MCP Client**: Claude Desktop, VS Code with MCP, or other MCP-compatible client
 
 ## Setup
@@ -581,6 +581,6 @@ After completing manual tests, fill out this report:
 
 For reference, automated test results are in [TEST_RESULTS.md](file:///d:/test_mcp/everything-search-mcp/TEST_RESULTS.md).
 
-**Automated Test Status**: ✅ ALL TESTS PASSED (44/44)
+**Automated Test Status**: ✅ ALL TESTS PASSED (81/81, vitest 5.0.4)
 
 *Last Updated: 2026-01-20*

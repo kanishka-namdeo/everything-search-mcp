@@ -7,7 +7,7 @@ import {
   ListToolsRequestSchema,
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
-import { z } from 'zod';
+import { parseSearchFilesArgs, parseGetFileInfoArgs } from './tool-args.js';
 import { searchFilesUnified, getFileInfoUnified, getStatusUnified } from './search/unified.js';
 import type { SearchResult, FileInfo, PlatformStatus } from './types/index.js';
 
@@ -116,15 +116,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case 'search_files': {
-        const query = args?.query as string;
-        const maxResults = (args?.maxResults as number) ?? 100;
-        const offset = (args?.offset as number) ?? 0;
-        const sortBy = args?.sortBy as 'name' | 'path' | 'size' | 'extension' | 'date_modified' | 'date_created' | 'attributes' | 'run_count';
-        const sortOrder = args?.sortOrder as 'ascending' | 'descending';
-        const matchPath = args?.matchPath as boolean;
-        const matchCase = args?.matchCase as boolean;
-        const matchWholeWord = args?.matchWholeWord as boolean;
-        const regex = args?.regex as boolean;
+        const toolArgs = parseSearchFilesArgs(args);
+        const query = toolArgs.query;
+        const maxResults = toolArgs.maxResults ?? 100;
+        const offset = toolArgs.offset ?? 0;
+        const sortBy = toolArgs.sortBy as 'name' | 'path' | 'size' | 'extension' | 'date_modified' | 'date_created' | 'attributes' | 'run_count';
+        const sortOrder = toolArgs.sortOrder as 'ascending' | 'descending';
+        const matchPath = toolArgs.matchPath as boolean;
+        const matchCase = toolArgs.matchCase as boolean;
+        const matchWholeWord = toolArgs.matchWholeWord as boolean;
+        const regex = toolArgs.regex as boolean;
 
         if (!query || query.trim().length === 0) {
           throw new Error('Query is required');
@@ -167,7 +168,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'get_file_info': {
-        const path = args?.path as string;
+        const path = parseGetFileInfoArgs(args).path;
 
         if (!path || path.trim().length === 0) {
           throw new Error('Path is required');

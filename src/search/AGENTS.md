@@ -27,7 +27,7 @@ DOX local contract for `src/search/`. Parent: [`AGENTS.md`](../AGENTS.md). Close
 - Relative imports require the `.js` extension (ESM; `unified.ts:1-11`).
 
 ## Verification
-- `npm test` = `vitest run`; currently 44/44 (`tests/security.test.ts` 22, `tests/integration.test.ts` 22). Neither test file imports `unified.ts` — dispatch here has no automated coverage.
+- `npm test` = `vitest run`; currently 81/81 across three files (`tests/security.test.ts` 22, `tests/integration.test.ts` 22, `tests/tool-args.test.ts` 37). No test imports `unified.ts` — the new gate test pulls in `src/tool-args.js`, not dispatch — so nothing here has automated coverage.
 - `npm run build` = `tsc` (`strict: true`, `tsconfig.json:8`) is the existing check that the triad signatures stay aligned.
 - On this Windows machine only the `isWindows()` branch can be exercised at runtime; the darwin/linux branches are unverified.
 

@@ -55,10 +55,10 @@ npm link
 
 **Automatic Setup (Recommended)**
 
-The es.exe CLI tool is automatically downloaded during npm install:
+The es.exe CLI tool is bundled in the package; the install step downloads it only when `bin/es.exe` is missing:
 
 - Supports x64, x86, and ARM64 architectures
-- Downloads latest stable release from GitHub
+- Downloads latest stable release from GitHub when needed
 - No manual installation required
 - es.exe is stored locally in the package directory
 
@@ -122,7 +122,7 @@ Add to your Claude Desktop configuration file:
 
 ### Advanced Configuration
 
-The MCP server uses standard configuration and doesn't require additional environment variables. On Windows, es.exe is automatically downloaded during npm install. On Linux, ensure ripgrep/locate are installed and accessible in your system PATH.
+The MCP server uses standard configuration and doesn't require additional environment variables. On Windows, es.exe is bundled with the package and is fetched only if `bin/es.exe` is missing. On Linux, ensure ripgrep/locate are installed and accessible in your system PATH.
 
 ## Usage
 
@@ -280,6 +280,28 @@ Check status of search engine and platform.
 }
 ```
 
+### Failed calls
+
+A rejected call returns the same error envelope, with `isError: true`, whatever the reason:
+
+```json
+{
+  "success": false,
+  "error": "Invalid arguments for search_files: query",
+  "errorCode": "INVALID_ARGUMENTS",
+  "tool": "search_files"
+}
+```
+
+`INVALID_ARGUMENTS` is returned only when a required argument is missing or of the wrong type: no `query` (or a non-string `query`) for `search_files`, no `path` (or a non-string `path`) for `get_file_info`, or `maxResults`/`offset` sent as non-numeric strings. Other rejections keep their own validation codes — `QUERY_TOO_LONG`, `PATH_TRAVERSAL`, `HOME_PATH_NOT_ALLOWED`, `INVALID_CHARACTERS`, `PATH_TOO_LONG`.
+
+Inputs that are loose but valid are still accepted, exactly as before:
+
+- Numeric strings are coerced (`"maxResults": "50"` behaves as `50`)
+- Out-of-range numbers such as `0` or `5000` for `maxResults` are clamped by the platform
+- `null` falls back to the documented defaults (100 results, offset 0)
+- Unrecognized extra keys are ignored, and an out-of-enum `sortBy`/`sortOrder` falls back to the default sort
+
 ## Platform-Specific Features
 
 ### Windows (Everything)
@@ -347,9 +369,10 @@ This MCP server implements comprehensive security measures to protect against co
 
 ### Security Testing
 
-All security measures are validated by 44 automated tests:
+All security measures are validated by 81 automated tests:
 - **22 Security Tests**: Input validation, sanitization, and protection mechanisms
 - **22 Integration Tests**: Real-world attack scenarios and edge cases
+- **37 Tool Argument Tests**: zod validation of `search_files` and `get_file_info` arguments
 
 For detailed test results, see [TEST_RESULTS.md](TEST_RESULTS.md).
 
@@ -368,7 +391,7 @@ When using this MCP server:
 
 **Error: "es.exe not found"**
 
-The es.exe CLI tool should be automatically downloaded during npm install. If you see this error:
+The package ships `bin/es.exe`, and the install step downloads it when that file is missing. If you see this error:
 
 1. Run the download script manually:
    ```bash
@@ -445,7 +468,7 @@ npm test -- tests/integration.test.ts
 ```
 
 **Test Coverage:**
-- 44 automated tests covering security, validation, and edge cases
+- 81 automated tests covering security, validation, tool-argument gating, and edge cases
 - See [TEST_RESULTS.md](TEST_RESULTS.md) for detailed test results
 - See [MANUAL_TESTING_GUIDE.md](MANUAL_TESTING_GUIDE.md) for manual testing procedures
 

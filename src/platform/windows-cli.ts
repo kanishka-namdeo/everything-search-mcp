@@ -98,11 +98,10 @@ export async function searchFiles(options: SearchOptions): Promise<any[]> {
         run_count: 'run-count',
       };
       const sortParam = sortMap[options.sortBy] || 'name';
-      args.push('-sort', sortParam);
-      
-      if (options.sortOrder === 'descending') {
-        args.push('-descending');
-      }
+      // ES encodes sort direction in the -sort value (e.g. "size-descending");
+      // there is no standalone -descending switch.
+      const sortArg = options.sortOrder === 'descending' ? `${sortParam}-descending` : sortParam;
+      args.push('-sort', sortArg);
     }
     
     const { stdout, stderr } = await execPromise(`"${esPath}" ${args.join(' ')}`, {

@@ -13,10 +13,13 @@ across any edit.
 - Search engine is chosen by OS at runtime (`src/search/unified.ts:13-52`): Windows shells out to
   the vendored `bin/es.exe` (voidtools Everything CLI), macOS uses `mdfind` (Spotlight), Linux uses
   `ripgrep` and falls back to `locate`. Nothing here talks to the Everything SDK.
-- ESM-only (`package.json:6`), Node `>=18` (`package.json:69-71`), TypeScript `strict` with
-  `src/` → `dist/` (`tsconfig.json:6-7`). `dist/index.js` is both `main` and the `bin` shim target.
-- `bin/es.exe` is a committed third-party Windows binary, normally fetched at install time by
-  `scripts/download-es.js` through the `postinstall` hook (`package.json:31`).
+- ESM-only (`package.json:6`), Node `>=20.0.0` (`package.json:69-71`, `"node": ">=20.0.0"` at `:70`),
+  TypeScript `strict` with `src/` → `dist/` (`tsconfig.json:2-15`). The compiler is TypeScript 7 —
+  the native Go port, so `tsc` CLI usage is unchanged and platform binaries arrive as
+  optionalDependencies. `dist/index.js` is both `main` and the `bin` shim target.
+- `bin/es.exe` is a committed third-party Windows binary, so a fresh checkout's `postinstall` hook
+  (`package.json:31`) takes the skip guard in `scripts/download-es.js:167-170`; the network fetch
+  only runs when `bin/es.exe` is missing.
 
 ## Read Before Editing
 
@@ -63,13 +66,13 @@ notes rather than explaining history. Trim obvious statements and dead warnings.
 - **Record behavior, do not silently fix it.** Where current code contradicts a doc or a comment,
   state what the code does and flag the mismatch in one line. Repair is a separate, scoped change.
 - `package.json:16-22` ships `dist`, `bin`, `scripts/download-es.js`, `LICENSE`, `README.md`.
-  `README.md` is the only documentation in the published tarball, so any user-visible claim must land
-  there. Other root docs are repo-only. `.npmignore:23` and the `files` whitelist both exclude
-  `AGENTS.md`, which is intended.
+  `README.md` is the only root-level documentation in the tarball, so any user-visible claim must land
+  there; other root docs are repo-only. An `AGENTS.md` inside a whitelisted directory still ships —
+  `npm pack --dry-run` lists `bin/AGENTS.md`, because the `files` whitelist beats `.npmignore:23` there.
 - `package.json` version is the single source of truth. Known drift, not yet fixed: `src/index.ts:17`
   registers the server as `1.0.0`; `CHANGELOG.md:8-10` has no `1.1.0` entry.
 - Publishing is release-driven, not push-driven: a published GitHub release triggers
-  `.github/workflows/npm-publish.yml`, which tests on Node 20 then runs
+  `.github/workflows/npm-publish.yml`, which tests on Node 24 then runs
   `npm publish --provenance --access public` with `secrets.NPM_TOKEN`. `prepublishOnly`
   (`package.json:27`) builds before testing. `PUBLISHING.md:225` describes a different, non-existent
   workflow; the file itself is the release-procedure doc.
@@ -80,9 +83,14 @@ notes rather than explaining history. Trim obvious statements and dead warnings.
 - Tracked, never DOX-owned: `dist/`, `.trae/`, `IMPLEMENTATION_SUMMARY.md` and `useless.md` are
   untracked or gitignored. `useless.md` is a generic agent-orchestration draft, not a contract for
   this repo.
-- `npm test` is `vitest run`. With no `vitest.config.*`, only `tests/*.test.ts` execute:
-  `tests/security.test.ts` and `tests/integration.test.ts`, 44 tests total. `tests/real-world-test.js`,
-  `test-simulation.js` and `scripts/test.js` are manual harnesses outside the suite.
+- Tool arguments are gated by zod 4 schemas in `src/tool-args.ts`, which throws the pre-existing
+  `ValidationError` with code `INVALID_ARGUMENTS`. The gate covers type, presence, coercion and
+  unknown-key stripping only; length, range and content limits stay in `src/utils/validation.ts`, so
+  security codes keep firing from the same places.
+- `npm test` is `vitest run` (vitest 5.0.4). With no `vitest.config.*`, only `tests/*.test.ts`
+  execute: `tests/security.test.ts`, `tests/integration.test.ts` and `tests/tool-args.test.ts`,
+  81 tests total. `tests/real-world-test.js`, `test-simulation.js` and `scripts/test.js` are manual
+  harnesses outside the suite.
 
 ## User Preferences
 

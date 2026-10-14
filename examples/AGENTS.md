@@ -23,7 +23,7 @@ DOX local contract for `examples/`. Parent: [`AGENTS.md`](../AGENTS.md). Closer 
 - No lint or formatter configuration exists in the repo; there is no JSON style standard here beyond valid JSON and matching the existing two-file layout.
 
 ## Verification
-- Nothing validates this folder programmatically. `npm test` (`package.json:28`) has no test importing or parsing `examples/`; `npm run build` (`package.json:24`) compiles `src/**/*` only (`tsconfig.json:16`); `npm pack --dry-run` deliberately excludes it (`package.json:16-22` allowlist has no `examples` entry, and `.npmignore:12` names `examples/`).
+- Nothing validates this folder programmatically. `npm test` (`package.json:28`) has no test importing or parsing `examples/`; `npm run build` (`package.json:24`) compiles `src/**/*` only (`tsconfig.json:17`); `npm pack --dry-run` deliberately excludes it (`package.json:16-22` allowlist has no `examples` entry, and `.npmignore:12` names `examples/`).
 - Correctness of a sample is confirmed only by loading it into a real Claude Desktop install per `MANUAL_TESTING_GUIDE.md`.
 
 ## Child DOX Index
