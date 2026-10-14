@@ -12,7 +12,7 @@ DOX local contract for `src/`. Parent: [`AGENTS.md`](../AGENTS.md). Closer doc w
 - Owned by the parent/root scope: `package.json` and its scripts, `tsconfig.json`, the vendored `bin/es.exe` and `scripts/download-es.js`, `tests/`, and npm publishing.
 
 ## Local Contracts
-- Server identity: `new Server({name: 'everything-search-mcp', version: '1.0.0'})` at `src/index.ts:14-24`. Unfixed drift: version is hardcoded `1.0.0` (`:17`) while `package.json:3` is `1.1.0`.
+- Server identity: `new Server({name: 'everything-search-mcp', version: '1.0.0'})` at `src/index.ts:14-24`. Unfixed drift: version is hardcoded `1.0.0` (`:17`) while `package.json:3` is `1.2.0`.
 - Tools are declared in the unchanged `src/index.ts:26-105` (input schemas) and handled in the single `CallToolRequestSchema` handler `src/index.ts:113-260`, with `ListTools` at `:107-111`; `main()` connects `StdioServerTransport` at `src/index.ts:262-267` and is invoked at import time (`:269`).
 - stdout is the MCP protocol channel: all logging goes to `console.error` (`src/index.ts:243`, and `main().catch` at `src/index.ts:269-272`). Never write to stdout from this subtree.
 - Argument gate (binding): every tool call passes through the zod 4 schemas in `src/tool-args.ts` (53 lines) before the handler reads them — `parseSearchFilesArgs` at `src/index.ts:119` (`SearchFilesArgsSchema` `:6-16`), `parseGetFileInfoArgs` at `src/index.ts:171` (`GetFileInfoArgsSchema` `:18-20`); `check_status` takes no arguments and has no gate. `toolArgumentSchemas` (`:22-25`) is the tool→schema map. `src/index.ts:10` is this import; the previously unused `import { z } from 'zod'` is gone.

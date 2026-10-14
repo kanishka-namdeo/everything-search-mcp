@@ -24,7 +24,7 @@ DOX local contract for `scripts/`. Parent: [`AGENTS.md`](../AGENTS.md). Closer d
 ## Work Guidance
 - Both files are ESM top-level-await-style scripts under `"type": "module"` (`package.json:6`); keep `.js`-suffixed relative imports (`test.js:3`) and node-builtin imports as in `download-es.js:1-6`.
 - Any change to the pipeline must preserve: skip-when-present idempotence (`:167-170`), extraction target `bin/` only, and cleanup of the intermediate zip (`:198`).
-- Documented manual recovery paths the script must keep working with: run it directly (`README.md:373-375`, `node node_modules/everything-search-mcp/scripts/download-es.js`) and the manual-download fallback the script itself prints (`:205-206`, `README.md:385-391`).
+- Documented manual recovery paths the script must keep working with: run it directly (`QUICKSTART.md:175`, `node node_modules/everything-search-mcp/scripts/download-es.js`) and the manual-download fallback the script itself prints (`:205-206`, `QUICKSTART.md:180-187`).
 
 ## Verification
 - No automated test covers this folder — `npm test` (vitest 5.0.4) runs `tests/security.test.ts` (22), `tests/integration.test.ts` (22), `tests/tool-args.test.ts` (37) and `tests/file-info.test.ts` (8) — 4 files / 89 tests, all passing — and none of the four imports anything from `scripts/`.

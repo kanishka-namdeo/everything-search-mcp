@@ -6,10 +6,10 @@ across any edit.
 
 ## Project
 
-- npm package `everything-search-mcp` (`package.json:3`, currently `1.1.0`): an MCP server exposing
+- npm package `everything-search-mcp` (`package.json:3`, currently `1.2.0`): an MCP server exposing
   filesystem search over stdio, so an LLM can locate files by name across an entire drive.
 - Three tools only, defined in `src/index.ts:26-105`: `search_files`, `get_file_info`,
-  `check_status`. `README.md:178-282` is the tool reference of record.
+  `check_status`. `README.md:93-187` is the tool reference of record.
 - Search engine is chosen by OS at runtime (`src/search/unified.ts:13-52`): Windows shells out to
   the vendored `bin/es.exe` (voidtools Everything CLI), macOS uses `mdfind` (Spotlight), Linux uses
   `ripgrep` and falls back to `locate`. Nothing here talks to the Everything SDK. This engine serves
@@ -71,17 +71,22 @@ notes rather than explaining history. Trim obvious statements and dead warnings.
   `README.md` is the only root-level documentation in the tarball, so any user-visible claim must land
   there; other root docs are repo-only. An `AGENTS.md` inside a whitelisted directory still ships —
   `npm pack --dry-run` lists `bin/AGENTS.md`, because the `files` whitelist beats `.npmignore:23` there.
+  README images live in `assets/` (not whitelisted) and are referenced by absolute
+  `raw.githubusercontent.com/.../main/assets/...` URLs, so they render on GitHub and npm without
+  growing the tarball.
 - `package.json` version is the single source of truth. Known drift, not yet fixed: `src/index.ts:17`
-  registers the server as `1.0.0`; `CHANGELOG.md:8-10` has no `1.1.0` entry.
+  registers the server as `1.0.0` while `package.json:3` is `1.2.0`; `CHANGELOG.md:8-10` has no
+  `1.1.0` entry.
 - Publishing is release-driven, not push-driven: a published GitHub release triggers
   `.github/workflows/npm-publish.yml`, which tests on Node 24 then runs
   `npm publish --provenance --access public` with `secrets.NPM_TOKEN`. `prepublishOnly`
   (`package.json:27`) builds before testing. `PUBLISHING.md:225` describes a different, non-existent
   workflow; the file itself is the release-procedure doc.
-- Documentation authority: installation and tool schema → `README.md`; security model →
-  `SECURITY.md`; manual QA procedure → `MANUAL_TESTING_GUIDE.md`; release procedure →
-  `PUBLISHING.md`; automated test evidence → `TEST_RESULTS.md`. `IMPLEMENTATION_SUMMARY.md` is
-  gitignored and describes the abandoned SDK approach — do not source contracts from it.
+- Documentation authority: installation and tool schema → `README.md`; platform setup, query syntax
+  and troubleshooting → `QUICKSTART.md`; security model → `SECURITY.md`; manual QA procedure →
+  `MANUAL_TESTING_GUIDE.md`; release procedure → `PUBLISHING.md`; automated test evidence →
+  `TEST_RESULTS.md`. `IMPLEMENTATION_SUMMARY.md` is gitignored and describes the abandoned SDK
+  approach — do not source contracts from it.
 - Tracked, never DOX-owned: `dist/`, `.trae/`, `IMPLEMENTATION_SUMMARY.md` and `useless.md` are
   untracked or gitignored. `useless.md` is a generic agent-orchestration draft, not a contract for
   this repo.
@@ -124,4 +129,6 @@ notes rather than explaining history. Trim obvious statements and dead warnings.
   harnesses that sit alongside it.
 - [`examples/AGENTS.md`](examples/AGENTS.md) — Claude Desktop configuration samples shipped in the
   repo.
+- [`assets/AGENTS.md`](assets/AGENTS.md) — README visual assets (banner, theme-paired architecture
+  diagram, verbatim-capture demo GIF) and their reproducible generators.
 - [`.github/AGENTS.md`](.github/AGENTS.md) — the release-triggered npm publish workflow.

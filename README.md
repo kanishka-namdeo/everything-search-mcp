@@ -1,257 +1,153 @@
-# Everything Search MCP Server
+<div align="center">
 
-A Model Context Protocol (MCP) server for fast file search using Everything (Windows) with cross-platform fallbacks for macOS (Spotlight) and Linux (ripgrep/locate).
+<img src="https://raw.githubusercontent.com/kanishka-namdeo/everything-search-mcp/main/assets/social-preview.png" alt="everything-search-mcp — whole-drive file search for your AI agents" width="100%">
 
-## Features
+[![npm version](https://img.shields.io/npm/v/everything-search-mcp?style=flat-square)](https://www.npmjs.com/package/everything-search-mcp)
+[![License: MIT](https://img.shields.io/npm/l/everything-search-mcp?style=flat-square)](https://github.com/kanishka-namdeo/everything-search-mcp/blob/main/LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen?style=flat-square)](https://nodejs.org/)
+![Windows](https://img.shields.io/badge/platform-windows-blue?style=flat-square)
+![macOS](https://img.shields.io/badge/platform-macos-blue?style=flat-square)
+![Linux](https://img.shields.io/badge/platform-linux-blue?style=flat-square)
+[![MCP SDK](https://img.shields.io/badge/MCP%20SDK-1.32-blue?style=flat-square&logo=modelcontextprotocol)](https://github.com/modelcontextprotocol/typescript-sdk)
 
-### Search Capabilities
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=everything-search-mcp&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22everything-search-mcp%22%5D%7D)
+[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=everything-search-mcp&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22everything-search-mcp%22%5D%7D&quality=insiders)
+[![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=everything-search-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImV2ZXJ5dGhpbmctc2VhcmNoLW1jcCJdfQ%3D%3D)
+[![Add to Kiro](https://kiro.dev/images/add-to-kiro.svg)](https://kiro.dev/launch/mcp/add?name=everything-search-mcp&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22everything-search-mcp%22%5D%7D)
+[![Install in LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](https://lmstudio.ai/install-mcp?name=everything-search-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImV2ZXJ5dGhpbmctc2VhcmNoLW1jcCJdfQ%3D%3D)
 
-- **Windows**: Everything CLI integration (es.exe)
-  - Fast, indexed file search
-  - Wildcards, operators (AND, OR, NOT)
-  - Regex support
-  - Sorting by name, size, date, etc.
-  - File metadata retrieval
-  - Automatic es.exe download during npm install
+</div>
 
-- **macOS**: Spotlight integration via mdfind
-  - Native macOS search
-  - File and folder search
-  - Spotlight query syntax
+# everything-search-mcp
 
-- **Linux**: ripgrep and locate support
-  - Fast search with ripgrep (preferred)
-  - Fallback to locate
-  - Pattern matching and regex
+**Whole-drive file search for your AI agents.** A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server that exposes your machine's native search index — Everything on Windows, Spotlight on macOS, ripgrep/locate on Linux — as three simple tools any MCP client can call. No cloud, no API keys, no indexing to wait for.
 
-### Security Features
+## Demo
 
-- **Input Validation**: All user inputs are validated and sanitized
-- **Command Injection Protection**: Shell metacharacters are removed from queries
-- **Path Traversal Protection**: Prevents access outside intended directories
-- **Resource Limits**: Built-in timeouts and buffer size limits
-- **Error Handling**: Secure error messages without information leakage
-- **Type Safety**: Strict TypeScript types prevent runtime errors
+Real session against the built server (Windows 11, Everything `es.exe` 1.1.0.36). A whole-drive query for `download-es.js` finds both the repo copy and the global npm-install copy; the argument gate rejects a call missing `query`:
 
-## Installation
+![Terminal demo: check_status, two whole-drive searches, get_file_info, and an INVALID_ARGUMENTS rejection](https://raw.githubusercontent.com/kanishka-namdeo/everything-search-mcp/main/assets/demo.gif)
 
-### Install MCP Server
+## Why
+
+- **Agents can't search your disk.** Filesystems are the one context window no LLM can read. This server hands it a search index instead.
+- **The OS already indexed everything.** Everything, Spotlight and ripgrep-backed locate keep a live index of your drives; this server queries it rather than walking folders.
+- **Three tools, zero configuration.** No environment variables, no API keys, no allowlists to maintain. Queries never leave your machine — the server only shells out locally.
+- **Belt and suspenders on input.** Every call passes a zod argument gate, then length/content validation and shell-argument sanitization before a subprocess is touched.
+
+## Install
+
+Requires Node.js >= 20. Nothing else — the Windows search CLI ships in the package.
 
 ```bash
 npm install -g everything-search-mcp
 ```
 
-Or for local development:
+Or skip installing entirely: MCP clients that support `npx` can launch the server on demand (the configs below do exactly that).
 
-```bash
-npm install
-npm run build
-npm link
-```
+### Claude Desktop
 
-### Platform-Specific Setup
-
-#### Windows Users
-
-**Automatic Setup (Recommended)**
-
-The es.exe CLI tool is bundled in the package; the install step downloads it only when `bin/es.exe` is missing:
-
-- Supports x64, x86, and ARM64 architectures
-- Downloads latest stable release from GitHub when needed
-- No manual installation required
-- es.exe is stored locally in the package directory
-
-The automatic download:
-1. Detects your system architecture (x64/x86/ARM64)
-2. Downloads the appropriate ES zip file from voidtools/ES releases
-3. Extracts es.exe to the local bin directory
-4. Cleans up the zip file
-
-**Manual Setup (Optional)**
-
-If you want the full Everything application for additional features:
-1. Install Everything from [voidtools.com](https://www.voidtools.com/)
-2. Ensure Everything is running
-3. Enable "Run as administrator" for best results
-
-**Note**: The MCP server works with just es.exe CLI tool. Installing the full Everything application is optional.
-
-#### macOS Users
-
-No additional installation required - Spotlight is built into macOS.
-
-#### Linux Users
-
-Install ripgrep for best performance:
-
-```bash
-sudo apt install ripgrep  # Ubuntu/Debian
-sudo dnf install ripgrep  # Fedora
-sudo pacman -S ripgrep    # Arch Linux
-```
-
-Or use locate (slower):
-
-```bash
-sudo apt install mlocate  # Ubuntu/Debian
-sudo dnf install mlocate  # Fedora
-sudo pacman -S mlocate    # Arch Linux
-```
-
-## Configuration
-
-### Claude Desktop Configuration
-
-Add to your Claude Desktop configuration file:
-
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+Add to `claude_desktop_config.json` (macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`, Windows: `%APPDATA%\Claude\claude_desktop_config.json`), then restart Claude Desktop:
 
 ```json
 {
   "mcpServers": {
     "everything-search": {
-      "command": "everything-search-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "everything-search-mcp"]
     }
   }
 }
 ```
 
-### Advanced Configuration
+### Claude Code
 
-The MCP server uses standard configuration and doesn't require additional environment variables. On Windows, es.exe is bundled with the package and is fetched only if `bin/es.exe` is missing. On Linux, ensure ripgrep/locate are installed and accessible in your system PATH.
-
-## Usage
-
-### Search Files
-
-Basic search:
-
-```json
-{
-  "name": "search_files",
-  "arguments": {
-    "query": "*.txt"
-  }
-}
+```bash
+claude mcp add --transport stdio --scope user everything-search-mcp -- npx -y everything-search-mcp
 ```
 
-Advanced search with sorting and options:
+### Every other client (Cursor, VS Code, Codex, OpenCode, …)
 
-```json
-{
-  "name": "search_files",
-  "arguments": {
-    "query": "invoice AND (pdf OR docx)",
-    "maxResults": 50,
-    "sortBy": "date_modified",
-    "sortOrder": "descending",
-    "matchPath": true,
-    "regex": false
-  }
-}
+```bash
+npx add-mcp everything-search-mcp
 ```
 
-### Get File Info
+The [`add-mcp`](https://add-mcp.com) one-liner writes the right config into whichever supported client it finds — same for the one-click buttons at the top (VS Code, Cursor, Kiro, LM Studio). Platform setup, query syntax and troubleshooting are in [QUICKSTART.md](QUICKSTART.md).
 
-```json
-{
-  "name": "get_file_info",
-  "arguments": {
-    "path": "C:\\Documents\\report.pdf"
-  }
-}
-```
+### What happens on Windows
 
-### Check Status
+`bin/es.exe` (the official voidtools Everything CLI) is bundled in the npm package. The install hook downloads it only if the file is missing, so offline and CI installs skip the network entirely. macOS and Linux need no extra setup beyond [optional ripgrep](QUICKSTART.md#platform-setup).
 
-```json
-{
-  "name": "check_status",
-  "arguments": {}
-}
-```
+## How it works
 
-## Tool Reference
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/kanishka-namdeo/everything-search-mcp/main/assets/architecture-light.png">
+  <img src="https://raw.githubusercontent.com/kanishka-namdeo/everything-search-mcp/main/assets/architecture-dark.png" alt="Architecture: MCP client speaks stdio JSON-RPC to the server; a zod gate and validation layer sit in front of per-OS adapters (es.exe, mdfind, ripgrep/locate); get_file_info bypasses all CLIs and reads metadata via Node fs." width="100%">
+</picture>
+
+- `src/index.ts` registers the three tools over a stdio MCP transport; every response is a JSON envelope in a single text content item.
+- Every `search_files` / `get_file_info` call passes the zod argument gate (`src/tool-args.ts`), then length, traversal and metacharacter validation (`src/utils/validation.ts`).
+- `src/search/unified.ts` routes the search to exactly one platform adapter: `es.exe` (Windows), `mdfind` (macOS), `rg` with `locate` fallback (Linux).
+- `get_file_info` deliberately **bypasses all CLIs**: it reads live metadata with a shell-free Node `fs` helper (`src/platform/file-info.ts`) on every platform.
+
+## Tool reference
 
 ### search_files
 
-Search for files and folders using platform's search engine.
-
-**Parameters:**
+Search for files and folders using the platform's native engine.
 
 | Parameter | Type | Required | Description | Limits |
-|-----------|------|----------|-------------|---------|
-| query | string | Yes | Search query. Supports wildcards (*, ?), operators (AND, OR, NOT), and regex on Windows | 1-1000 characters |
-| maxResults | number | No | Maximum results to return (default: 100) | 1-1000 |
-| offset | number | No | Number of results to skip (default: 0) | 0-100000 |
-| sortBy | string | No | Sort field: name, path, size, extension, date_modified, date_created, attributes, run_count (Windows only) | - |
-| sortOrder | string | No | Sort order: ascending or descending (Windows only) | - |
-| matchPath | boolean | No | Match against full path (Windows only) | - |
-| matchCase | boolean | No | Enable case-sensitive matching | - |
-| matchWholeWord | boolean | No | Match whole words only (Windows only) | - |
-| regex | boolean | No | Enable regex mode | - |
+|-----------|------|----------|-------------|--------|
+| query | string | Yes | Search query. Wildcards (`*`, `?`), operators (`AND`, `OR`, `NOT`) and regex on Windows; Spotlight syntax on macOS; regex on Linux | 1–1000 characters |
+| maxResults | number | No | Maximum results (default 100) | Values above 1000 are clamped to 1000 |
+| offset | number | No | Results to skip (default 0) | Applied on macOS/Linux; currently ignored on Windows |
+| sortBy | string | No | `name`, `path`, `size`, `extension`, `date_modified`, `date_created`, `attributes`, `run_count` | Windows only |
+| sortOrder | string | No | `ascending` or `descending` | Windows only |
+| matchPath | boolean | No | Match against the full path | Windows only |
+| matchCase | boolean | No | Case-sensitive matching | All platforms |
+| matchWholeWord | boolean | No | Whole-word matching | Windows only |
+| regex | boolean | No | Regex mode | Windows and Linux |
 
-**Validation:**
-- Empty queries are rejected
-- Queries exceeding 1000 characters are rejected
-- Shell metacharacters are automatically removed
-- Path traversal attempts are blocked
-
-**Response:**
+Results are returned as recorded — real output from a live session:
 
 ```json
 {
   "success": true,
-  "count": 5,
+  "count": 1,
   "results": [
     {
-      "name": "document.txt",
-      "path": "C:\\Documents",
-      "fullPath": "C:\\Documents\\document.txt",
-      "size": 1024,
-      "modified": "2024-01-20T10:30:00.000Z",
-      "created": "2024-01-15T08:00:00.000Z",
-      "extension": "txt",
+      "name": "D:\\test_mcp\\everything-search-mcp\\src\\platform\\windows-cli.ts",
+      "path": "",
+      "fullPath": "D:\\test_mcp\\everything-search-mcp\\src\\platform\\windows-cli.ts",
+      "extension": "ts",
       "isFolder": false,
-      "isFile": true
+      "isFile": false
     }
   ]
 }
 ```
 
+Note the platform reality: `es.exe` prints one full path per line, so on Windows `name` carries the whole path and `path`/`isFile`/`isFolder` are not populated, and search results never include size or dates on any platform. For rich metadata on a specific hit, call `get_file_info` — that is the intended pairing.
+
 ### get_file_info
 
-Get detailed metadata for a specific file or folder.
-
-**Parameters:**
+Detailed metadata for one file or folder — live `fs` reads, no shell involved.
 
 | Parameter | Type | Required | Description | Limits |
-|-----------|------|----------|-------------|---------|
-| path | string | Yes | Full path to file or folder | 1-4096 characters |
-
-**Validation:**
-- Empty paths are rejected
-- Paths exceeding 4096 characters are rejected
-- Path traversal attempts are blocked
-- Shell metacharacters are rejected
-
-**Response:**
+|-----------|------|----------|-------------|--------|
+| path | string | Yes | Full path to a file or folder | 1–4096 characters |
 
 ```json
 {
   "success": true,
   "info": {
-    "name": "document.txt",
-    "path": "C:\\Documents",
-    "size": 1024,
-    "created": "2024-01-15T08:00:00.000Z",
-    "modified": "2024-01-20T10:30:00.000Z",
-    "accessed": "2024-01-20T10:30:00.000Z",
-    "extension": "txt",
+    "name": "package.json",
+    "path": "D:\\test_mcp\\everything-search-mcp",
+    "size": 1833,
+    "created": "2026-10-14T06:23:20.119Z",
+    "modified": "2026-10-14T09:40:33.345Z",
+    "accessed": "2026-10-14T09:45:51.763Z",
+    "extension": "json",
     "isFolder": false,
     "isFile": true
   }
@@ -260,11 +156,7 @@ Get detailed metadata for a specific file or folder.
 
 ### check_status
 
-Check status of search engine and platform.
-
-**Parameters:** None
-
-**Response:**
+Report the detected platform and search engine. No parameters.
 
 ```json
 {
@@ -281,7 +173,7 @@ Check status of search engine and platform.
 
 ### Failed calls
 
-A rejected call returns the same error envelope, with `isError: true`, whatever the reason:
+Rejections share one envelope, returned with `isError: true`:
 
 ```json
 {
@@ -292,194 +184,47 @@ A rejected call returns the same error envelope, with `isError: true`, whatever 
 }
 ```
 
-`INVALID_ARGUMENTS` is returned only when a required argument is missing or of the wrong type: no `query` (or a non-string `query`) for `search_files`, no `path` (or a non-string `path`) for `get_file_info`, or `maxResults`/`offset` sent as non-numeric strings. Other rejections keep their own validation codes — `QUERY_TOO_LONG`, `PATH_TRAVERSAL`, `HOME_PATH_NOT_ALLOWED`, `INVALID_CHARACTERS`, `PATH_TOO_LONG`.
+Codes: `INVALID_ARGUMENTS` (missing/mistyped required argument — the zod gate), plus `QUERY_TOO_LONG`, `PATH_TRAVERSAL`, `HOME_PATH_NOT_ALLOWED`, `INVALID_CHARACTERS`, `PATH_TOO_LONG` from the validation layer. Loose-but-valid input is accepted deliberately: numeric strings coerce (`"50"` → 50), `null` falls back to defaults, unknown keys are stripped, and out-of-enum `sortBy`/`sortOrder` reach the adapter's default sort.
 
-Inputs that are loose but valid are still accepted, exactly as before:
+## Query syntax
 
-- Numeric strings are coerced (`"maxResults": "50"` behaves as `50`)
-- Out-of-range numbers such as `0` or `5000` for `maxResults` are clamped by the platform
-- `null` falls back to the documented defaults (100 results, offset 0)
-- Unrecognized extra keys are ignored, and an out-of-enum `sortBy`/`sortOrder` falls back to the default sort
+Full per-platform operator tables and examples live in [QUICKSTART.md](QUICKSTART.md#query-syntax-by-platform). A taste:
 
-## Platform-Specific Features
-
-### Windows (Everything)
-
-**Automatic es.exe Download:**
-
-During `npm install`, the package automatically:
-1. Detects system architecture (x64, x86, or ARM64)
-2. Downloads the latest ES release from GitHub
-3. Extracts es.exe to the local bin directory
-4. Stores es.exe alongside the package
-
-This eliminates the need to manually install Everything or configure es.exe.
-
-**Query Operators:**
-- `AND` - Both terms must match
-- `OR` - Either term can match
-- `NOT` - Exclude term
-- `""` - Exact phrase
-- `*` - Wildcard for multiple characters
-- `?` - Wildcard for single character
-
-**Examples:**
-- `*.txt` - All .txt files
-- `invoice AND pdf` - Files containing both "invoice" and "pdf"
-- `report NOT draft` - Files with "report" but not "draft"
-- `"my document".pdf` - Exact phrase with .pdf extension
-
-### macOS (Spotlight)
-
-**Query Syntax:**
-- Basic text search
-- `kind:pdf` - File type filter
-- `date:today` - Date filter
-- `name:document` - Name search
-
-**Examples:**
-- `document` - Search for "document"
-- `kind:pdf document` - PDF files with "document"
-- `date:today` - Modified today
-
-### Linux (ripgrep/locate)
-
-**Query Syntax:**
-- Basic pattern matching
-- Regex supported
-- Case-insensitive by default
-
-**Examples:**
-- `document` - Search for "document"
-- `\.txt$` - Regex for .txt files
-- `invoice.*pdf` - Regex pattern
+| Platform | Engine | Example |
+|----------|--------|---------|
+| Windows | Everything (`es.exe`) | `invoice AND (pdf OR docx)`, `*.txt`, `report NOT draft` |
+| macOS | Spotlight (`mdfind`) | `kind:pdf document`, `name:report` |
+| Linux | ripgrep → locate | `\.txt$` (regex), plain substring |
 
 ## Security
 
-### Overview
+Search queries and paths are validated and sanitized before reaching a subprocess; `get_file_info` never reaches one. Searches carry a 30-second timeout and a 50 MB output cap. The full model, including known limitations, is in [SECURITY.md](SECURITY.md).
 
-This MCP server implements comprehensive security measures to protect against common vulnerabilities:
-- **Command Injection Protection**: All user inputs are sanitized to remove shell metacharacters (`;`, `&`, `|`, `$`, `(`, `)`, `` ` ``, `~`)
-- **Path Traversal Protection**: Detects and blocks `..` sequences and home directory access (`~`)
-- **Input Validation**: Strict validation of query length (max 1000 chars), path length (max 4096 chars), and parameter bounds
-- **Resource Limits**: Command timeouts (30 seconds) and buffer size limits (50MB) prevent DoS attacks
-- **Error Handling**: Secure error messages that don't leak system information
-- **Type Safety**: TypeScript strict mode prevents type-related vulnerabilities
+## Quality
 
-### Security Testing
-
-All security measures are validated by 81 automated tests:
-- **22 Security Tests**: Input validation, sanitization, and protection mechanisms
-- **22 Integration Tests**: Real-world attack scenarios and edge cases
-- **37 Tool Argument Tests**: zod validation of `search_files` and `get_file_info` arguments
-
-For detailed test results, see [TEST_RESULTS.md](TEST_RESULTS.md).
-
-### Best Practices
-
-When using this MCP server:
-
-1. **Use Specific Queries**: Narrow searches to specific file patterns instead of wildcards
-2. **Set Reasonable Limits**: Keep `maxResults` under 100 for typical use cases
-3. **Validate Results**: Always verify file paths before accessing files
-4. **Monitor Logs**: Check server logs for validation errors and security warnings
-
-## Troubleshooting
-
-### Windows
-
-**Error: "es.exe not found"**
-
-The package ships `bin/es.exe`, and the install step downloads it when that file is missing. If you see this error:
-
-1. Run the download script manually:
-   ```bash
-   node node_modules/everything-search-mcp/scripts/download-es.js
-   ```
-2. Check that you have internet connectivity to download from GitHub
-3. Verify npm install completed successfully
-4. Try reinstalling the package:
-   ```bash
-   npm uninstall everything-search-mcp
-   npm install -g everything-search-mcp
-   ```
-
-**Download Fails During npm install**
-
-If the automatic download fails:
-1. Check your internet connection
-2. Ensure GitHub is accessible from your network
-3. Manually download es.exe from https://github.com/voidtools/ES/releases
-4. Place es.exe in the package's `bin/` directory
-
-**Search Returns No Results**
-
-1. Ensure Everything (full application) is running and has indexed files
-2. Run Everything and let it complete indexing
-3. Check file paths are accessible
-4. Try a broader search query
-
-### macOS
-
-**Error: "mdfind command not found"**
-- This should not happen as mdfind is built into macOS
-- Check that Spotlight is enabled in System Settings
-
-### Linux
-
-**Error: "Neither ripgrep nor locate found"**
-- Install ripgrep for best performance:
-  ```bash
-  sudo apt install ripgrep
-  ```
-- Or install locate as a fallback:
-  ```bash
-  sudo apt install mlocate
-  sudo updatedb
-  ```
+- **89 automated tests** across 4 suites (security, integration, argument-gate, file-info): `npm test`
+- Evidence and how to reproduce: [TEST_RESULTS.md](TEST_RESULTS.md)
+- End-to-end manual QA procedure: [MANUAL_TESTING_GUIDE.md](MANUAL_TESTING_GUIDE.md)
+- CI publishes on release: [.github/workflows/npm-publish.yml](.github/workflows/npm-publish.yml)
 
 ## Development
 
-### Building
-
 ```bash
-npm run build
+npm install
+npm run build   # tsc -> dist/
+npm test        # vitest run
+npm run dev     # tsx src/index.ts
 ```
-
-### Running in Development
-
-```bash
-npm run dev
-```
-
-### Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run specific test file
-npm test -- tests/security.test.ts
-npm test -- tests/integration.test.ts
-```
-
-**Test Coverage:**
-- 81 automated tests covering security, validation, tool-argument gating, and edge cases
-- See [TEST_RESULTS.md](TEST_RESULTS.md) for detailed test results
-- See [MANUAL_TESTING_GUIDE.md](MANUAL_TESTING_GUIDE.md) for manual testing procedures
-
-## License
-
-MIT
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit issues or pull requests.
+Issues and pull requests are welcome. For larger changes, open an issue first so we can agree on scope. Release procedure for maintainers is in [PUBLISHING.md](PUBLISHING.md).
+
+## License
+
+MIT — see [LICENSE](LICENSE).
 
 ## Acknowledgments
 
-- Everything search by voidtools.com
-- Model Context Protocol by Anthropic
+- [Everything](https://www.voidtools.com/) and its `es.exe` CLI by voidtools
+- [Model Context Protocol](https://modelcontextprotocol.io) by Anthropic

@@ -1,0 +1,35 @@
+{
+  "provenance": "captured 2026-10-14 against dist/index.js, Everything es.exe 1.1.0.36",
+  "windowTitle": "everything-search-mcp — real session, Windows 11, 2026-10-14",
+  "sections": [
+    {
+      "cmd": "$ node dist/index.js",
+      "note": "# stdio MCP server ready — 3 tools exposed"
+    },
+    {
+      "cmd": "> tools/call check_status",
+      "responseText": "{\n  \"success\": true,\n  \"status\": {\n    \"platform\": \"windows\",\n    \"searchEngine\": \"Everything (es.exe CLI)\",\n    \"available\": true,\n    \"version\": \"1.1.0.36\",\n    \"message\": \"Everything command-line interface available\"\n  }\n}",
+      "note": "# 204 ms"
+    },
+    {
+      "cmd": "> tools/call search_files { \"query\": \"download-es.js\" }",
+      "responseText": "{\n  \"success\": true,\n  \"count\": 2,\n  \"results\": [\n    {\n      \"name\": \"C:\\\\Users\\\\kanis\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\everything-search-mcp\\\\scripts\\\\download-es.js\",\n      \"path\": \"\",\n      \"fullPath\": \"C:\\\\Users\\\\kanis\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\everything-search-mcp\\\\scripts\\\\download-es.js\",\n      \"extension\": \"js\",\n      \"isFolder\": false,\n      \"isFile\": false\n    },\n    {\n      \"name\": \"D:\\\\test_mcp\\\\everything-search-mcp\\\\scripts\\\\download-es.js\",\n      \"path\": \"\",\n      \"fullPath\": \"D:\\\\test_mcp\\\\everything-search-mcp\\\\scripts\\\\download-es.js\",\n      \"extension\": \"js\",\n      \"isFolder\": false,\n      \"isFile\": false\n    }\n  ]\n}",
+      "note": "# 1.1 s — whole drive"
+    },
+    {
+      "cmd": "> tools/call search_files { \"query\": \"windows-cli.ts\" }",
+      "responseText": "{\n  \"success\": true,\n  \"count\": 1,\n  \"results\": [\n    {\n      \"name\": \"D:\\\\test_mcp\\\\everything-search-mcp\\\\src\\\\platform\\\\windows-cli.ts\",\n      \"path\": \"\",\n      \"fullPath\": \"D:\\\\test_mcp\\\\everything-search-mcp\\\\src\\\\platform\\\\windows-cli.ts\",\n      \"extension\": \"ts\",\n      \"isFolder\": false,\n      \"isFile\": false\n    }\n  ]\n}",
+      "note": "# 0.7 s"
+    },
+    {
+      "cmd": "> tools/call get_file_info { \"path\": \"D:\\\\test_mcp\\\\everything-search-mcp\\\\package.json\" }",
+      "responseText": "{\n  \"success\": true,\n  \"info\": {\n    \"name\": \"package.json\",\n    \"path\": \"D:\\\\test_mcp\\\\everything-search-mcp\",\n    \"size\": 1833,\n    \"created\": \"2026-10-14T06:23:20.119Z\",\n    \"modified\": \"2026-10-14T09:40:33.345Z\",\n    \"accessed\": \"2026-10-14T10:58:04.377Z\",\n    \"extension\": \"json\",\n    \"isFolder\": false,\n    \"isFile\": true\n  }\n}",
+      "note": "# 3 ms"
+    },
+    {
+      "cmd": "> tools/call search_files {}",
+      "responseText": "{\n  \"success\": false,\n  \"error\": \"Invalid arguments for search_files: query\",\n  \"errorCode\": \"INVALID_ARGUMENTS\",\n  \"tool\": \"search_files\"\n}",
+      "note": "# argument gate — nothing reaches the shell"
+    }
+  ]
+}

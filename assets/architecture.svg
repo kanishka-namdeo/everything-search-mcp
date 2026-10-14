@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640">
+  <defs>
+    <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#58a6ff"/>
+    </marker>
+    <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d29922"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="640" fill="#0d1117"/>
+
+  <text x="40" y="64" font-family="Segoe UI" font-size="32" font-weight="bold" fill="#c9d1d9">How it works</text>
+
+  <!-- Box 1: MCP client -->
+  <rect x="40" y="185" width="250" height="110" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="165" y="228" font-family="Segoe UI" font-size="19" font-weight="bold" fill="#c9d1d9" text-anchor="middle">MCP client</text>
+  <text x="165" y="253" font-family="Segoe UI" font-size="13" fill="#8b949e" text-anchor="middle">Claude Desktop · Cursor</text>
+  <text x="165" y="272" font-family="Segoe UI" font-size="13" fill="#8b949e" text-anchor="middle">VS Code · any stdio client</text>
+
+  <!-- Arrow 1 -->
+  <line x1="294" y1="240" x2="394" y2="240" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrB)"/>
+  <text x="345" y="228" font-family="Segoe UI" font-size="13" fill="#8b949e" text-anchor="middle">stdio · JSON-RPC</text>
+
+  <!-- Box 2: the server -->
+  <rect x="400" y="160" width="320" height="160" rx="12" fill="#0f2340" stroke="#58a6ff" stroke-width="2"/>
+  <text x="560" y="192" font-family="Segoe UI" font-size="20" font-weight="bold" fill="#58a6ff" text-anchor="middle">everything-search-mcp</text>
+  <rect x="424" y="212" width="88" height="32" rx="16" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="468" y="233" font-family="Segoe UI" font-size="13" fill="#c9d1d9" text-anchor="middle">3 tools</text>
+  <rect x="524" y="212" width="112" height="32" rx="16" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="580" y="233" font-family="Segoe UI" font-size="13" fill="#c9d1d9" text-anchor="middle">zod arg gate</text>
+  <rect x="424" y="258" width="272" height="36" rx="18" fill="#12261c" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="560" y="281" font-family="Segoe UI" font-size="14" fill="#c9d1d9" text-anchor="middle">validation + sanitization</text>
+
+  <!-- Arrow 2: platform dispatch -->
+  <line x1="724" y1="240" x2="850" y2="240" stroke="#58a6ff" stroke-width="2"/>
+  <line x1="850" y1="168" x2="850" y2="312" stroke="#58a6ff" stroke-width="2"/>
+  <line x1="850" y1="168" x2="860" y2="168" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrB)"/>
+  <line x1="850" y1="240" x2="860" y2="240" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrB)"/>
+  <line x1="850" y1="312" x2="860" y2="312" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrB)"/>
+  <text x="784" y="221" font-family="Segoe UI" font-size="11" fill="#8b949e" text-anchor="middle">platform dispatch</text>
+  <text x="784" y="234" font-family="Segoe UI" font-size="11" fill="#8b949e" text-anchor="middle">(src/search/unified.ts)</text>
+
+  <!-- Adapter stack -->
+  <rect x="866" y="136" width="294" height="64" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="1013" y="163" font-family="Segoe UI" font-size="14" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Windows — bin/es.exe</text>
+  <text x="1013" y="184" font-family="Segoe UI" font-size="13" fill="#8b949e" text-anchor="middle">(Everything CLI)</text>
+
+  <rect x="866" y="208" width="294" height="64" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="1013" y="235" font-family="Segoe UI" font-size="14" font-weight="bold" fill="#c9d1d9" text-anchor="middle">macOS — mdfind</text>
+  <text x="1013" y="256" font-family="Segoe UI" font-size="13" fill="#8b949e" text-anchor="middle">(Spotlight)</text>
+
+  <rect x="866" y="280" width="294" height="64" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="1013" y="307" font-family="Segoe UI" font-size="14" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Linux — rg, fallback locate</text>
+  <text x="1013" y="328" font-family="Segoe UI" font-size="13" fill="#8b949e" text-anchor="middle">(external CLIs, chosen at runtime)</text>
+
+  <!-- get_file_info side path (amber) -->
+  <line x1="560" y1="324" x2="560" y2="444" stroke="#d29922" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrA)"/>
+  <text x="576" y="380" font-family="Segoe UI" font-size="14" font-weight="bold" fill="#d29922">get_file_info</text>
+  <text x="576" y="400" font-family="Segoe UI" font-size="12" fill="#8b949e">separate path — no CLI involved</text>
+
+  <rect x="400" y="452" width="320" height="100" rx="10" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="560" y="486" font-family="Segoe UI" font-size="16" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Node fs stat — shell-free</text>
+  <text x="560" y="508" font-family="Segoe UI" font-size="13" fill="#8b949e" text-anchor="middle">(src/platform/file-info.ts)</text>
+  <text x="560" y="532" font-family="Segoe UI" font-size="12" fill="#d29922" text-anchor="middle">same helper on Windows · macOS · Linux</text>
+
+  <!-- Footer -->
+  <text x="600" y="612" font-family="Segoe UI" font-size="14" fill="#8b949e" text-anchor="middle">TypeScript ESM · Node >=20 · no API keys · no cloud</text>
+</svg>

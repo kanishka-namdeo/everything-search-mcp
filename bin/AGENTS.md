@@ -13,7 +13,7 @@ DOX local contract for `bin/`. Parent: [`AGENTS.md`](../AGENTS.md). Closer doc w
 - The mechanism that can place/refresh the binary (GitHub release download) is owned by `scripts/` — see `scripts/AGENTS.md`.
 
 ## Local Contracts
-- `bin/es.exe` is vendored upstream content: never hand-edit, recompile, stub, or swap it. The only sanctioned ways it changes are the postinstall download (`scripts/download-es.js:136-161`) or the documented manual placement from `https://github.com/voidtools/ES/releases` (`README.md:390-391`).
+- `bin/es.exe` is vendored upstream content: never hand-edit, recompile, stub, or swap it. The only sanctioned ways it changes are the postinstall download (`scripts/download-es.js:136-161`) or the documented manual placement from `https://github.com/voidtools/ES/releases` (`QUICKSTART.md:186`).
 - Survives gitignore by explicit negation: `.gitignore:191-192` (`!bin/`, `!bin/es.exe`). Verified: `git check-ignore` reports `bin/es.exe` as not ignored, and no active exclude rule actually matches it — the build-artifact block (`.gitignore:176-185`) lists `*.dll`, `*.so`, `*.a`, etc. but no `*.exe`; the negations are protective against future broad rules.
 - Shipped to consumers: the `files` whitelist `package.json:16-22` includes `bin`, so the tarball carries the binary on every platform.
 - Windows-only artifact in a cross-platform package: `package.json:72-76` declares `os: ["win32","darwin","linux"]`. macOS/Linux installs still run the postinstall download (`package.json:31`, no platform check in the script) and receive the same `.exe`; it is inert there — those platforms dispatch to Spotlight/ripgrep, not this binary.
@@ -22,7 +22,7 @@ DOX local contract for `bin/`. Parent: [`AGENTS.md`](../AGENTS.md). Closer doc w
 - The binary is now used only by `search_files` and `check_status`. `get_file_info` no longer shells out to it: it delegates to the shell-free `src/platform/file-info.ts` helper, so the package no longer emits the `-info` switch this binary lacks (previously always `Error 6: Unknown switch.`). The tool-level record is in `src/platform/AGENTS.md`.
 
 ## Work Guidance
-- The one documented procedure that touches this folder is manual binary recovery (`README.md:385-391`): download `es.exe` from the voidtools/ES releases page and place it in `bin/`. Any binary refresh must come from that upstream source; record the release tag and SHA-256 in the commit, since no provenance file exists.
+- The one documented procedure that touches this folder is manual binary recovery (`QUICKSTART.md:180-187`): download `es.exe` from the voidtools/ES releases page and place it in `bin/`. Any binary refresh must come from that upstream source; record the release tag and SHA-256 in the commit, since no provenance file exists.
 
 ## Verification
 - No automated test covers `bin/`: the vitest suite (`tests/security.test.ts` 22, `tests/integration.test.ts` 22, `tests/tool-args.test.ts` 37, `tests/file-info.test.ts` 8 — 89/89 passing under vitest 5.0.4) imports `src/utils/validation.js`, `src/tool-args.js` and `src/platform/file-info.js`, never the binary.
